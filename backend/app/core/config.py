@@ -22,7 +22,9 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: List[str] = [
         "http://localhost:12800",
         "http://localhost:5173",
-        "http://localhost:12801"
+        "http://localhost:12801",
+        "http://82.156.213.38",  # 生产环境服务器
+        "http://82.156.213.38:80"  # 生产环境80端口
     ]
 
     # JWT配置（单用户版不需要，预留）
