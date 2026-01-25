@@ -2,7 +2,7 @@
 API v1 路由聚合
 """
 from fastapi import APIRouter
-from app.api.v1 import rooms, plants, tasks, images, configs, task_types, shelves
+from app.api.v1 import rooms, plants, tasks, images, configs, task_types, shelves, suggestions
 
 api_router = APIRouter()
 
@@ -43,4 +43,10 @@ api_router.include_router(
 api_router.include_router(
     shelves.router,
     tags=["shelves"]
+)
+
+api_router.include_router(
+    suggestions.router,
+    prefix="/suggestions",
+    tags=["suggestions"]
 )

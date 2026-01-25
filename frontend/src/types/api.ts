@@ -213,3 +213,33 @@ export interface DashboardStats {
   overdueTasksCount: number
   upcomingTasksCount: number
 }
+
+// ==================== Suggestion Types ====================
+
+export type SuggestionCategory = '功能请求' | '问题反馈' | '改进建议' | '其他'
+export type SuggestionStatus = 'pending' | 'reviewing' | 'implemented' | 'rejected'
+export type SuggestionPriority = 'low' | 'medium' | 'high'
+
+export interface Suggestion {
+  id: number
+  title: string
+  content: string
+  category: SuggestionCategory
+  status: SuggestionStatus
+  priority: SuggestionPriority
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface SuggestionFormData {
+  title: string
+  content: string
+  category?: SuggestionCategory
+  priority?: SuggestionPriority
+}
+
+export interface SuggestionFilters {
+  skip?: number
+  limit?: number
+}

@@ -6,6 +6,7 @@ from sqlalchemy import func
 from typing import List, Optional
 from app.models.room import Room
 from app.models.plant import Plant
+from app.models.plant_shelf import PlantShelf
 
 
 class RoomService:
@@ -62,11 +63,23 @@ class RoomService:
         return room_dict
 
     def create_room(self, room_data) -> dict:
-        """创建房间"""
+        """创建房间（自动创建默认花架）"""
         new_room = Room(**room_data.dict())
         self.db.add(new_room)
         self.db.commit()
         self.db.refresh(new_room)
+
+        # 自动创建默认花架
+        default_shelf = PlantShelf(
+            room_id=new_room.id,
+            name=f"{new_room.name}默认花架",
+            is_default=True,
+            sort_order=0,
+            capacity=50
+        )
+        self.db.add(default_shelf)
+        self.db.commit()
+
         return new_room.to_dict()
 
     def update_room(self, room_id: int, room_data) -> Optional[dict]:

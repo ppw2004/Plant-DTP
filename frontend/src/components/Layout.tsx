@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Layout as AntLayout, Menu, theme } from 'antd'
-import { HomeOutlined, FolderOutlined, InfoCircleOutlined, CheckCircleOutlined, InboxOutlined } from '@ant-design/icons'
+import { HomeOutlined, FolderOutlined, InfoCircleOutlined, CheckCircleOutlined, InboxOutlined, MessageOutlined } from '@ant-design/icons'
 
 const { Header, Content, Sider } = AntLayout
 
@@ -21,6 +21,7 @@ const Layout = ({ children }: LayoutProps) => {
     { key: '/plants', icon: <InfoCircleOutlined />, label: '植物' },
     { key: '/tasks', icon: <CheckCircleOutlined />, label: '任务' },
     { key: '/archive', icon: <InboxOutlined />, label: '归档库' },
+    { key: '/suggestions', icon: <MessageOutlined />, label: '留言板' },
   ]
 
   return (

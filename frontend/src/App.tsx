@@ -5,6 +5,7 @@ import Rooms from './pages/Rooms'
 import Plants from './pages/Plants'
 import Tasks from './pages/Tasks'
 import ArchivedPlants from './pages/ArchivedPlants'
+import Suggestions from './pages/Suggestions'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/plants" element={<Plants />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/archive" element={<ArchivedPlants />} />
+        <Route path="/suggestions" element={<Suggestions />} />
       </Routes>
     </Layout>
   )

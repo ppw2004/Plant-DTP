@@ -1,5 +1,5 @@
 import { Button, Input, Space, Tag, Empty, Card, Row, Col, message, Popconfirm } from 'antd'
-import { ReloadOutlined, SearchOutlined, RestoreOutlined, DeleteOutlined } from '@ant-design/icons'
+import { ReloadOutlined, SearchOutlined, UndoOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getArchivedPlants, restorePlant, permanentDeletePlant } from '../services/plantService'
@@ -146,7 +146,7 @@ const ArchivedPlants = () => {
                 <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
                   <Button
                     type="primary"
-                    icon={<RestoreOutlined />}
+                    icon={<UndoOutlined />}
                     onClick={() => handleRestore(plant)}
                     loading={restoreMutation.isPending}
                     style={{ flex: 1 }}

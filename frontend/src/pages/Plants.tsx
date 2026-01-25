@@ -62,11 +62,9 @@ const Plants = () => {
   // 加载花架数据 - 使用 ref 避免依赖 rooms 导致的循环
   const loadShelves = useCallback(async (roomsToLoad: typeof rooms) => {
     if (!roomsToLoad || roomsToLoad.length === 0) {
-      console.log('No rooms to load shelves for')
       return
     }
 
-    console.log('Loading shelves for rooms:', roomsToLoad.map(r => ({ id: r.id, name: r.name })))
     const shelvesData: Record<number, any[]> = {}
     const plantsData: Record<number, Plant[]> = {}
 
@@ -74,21 +72,18 @@ const Plants = () => {
       try {
         const { getShelves, getShelf } = await import('../services/shelfService')
         const shelves = await getShelves(room.id)
-        console.log(`Room ${room.id} (${room.name}):`, shelves.items)
         shelvesData[room.id] = shelves.items
 
         // 获取每个花架的植物
         for (const shelf of shelves.items) {
           const shelfDetail = await getShelf(shelf.id)
           plantsData[shelf.id] = shelfDetail.plants || []
-          console.log(`  Shelf ${shelf.id}: ${plantsData[shelf.id].length} plants`)
         }
       } catch (error) {
         console.error('Failed to load shelves:', error)
       }
     }
 
-    console.log('Final shelvesMap:', shelvesData)
     setShelvesMap(shelvesData)
     setPlantsMap(plantsData)
   }, []) // 空依赖数组，函数只创建一次
@@ -98,7 +93,8 @@ const Plants = () => {
     if (rooms && rooms.length > 0) {
       loadShelves(rooms)
     }
-  }, [rooms?.length, loadShelves]) // 只在房间数量变化时重新加载
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rooms?.length]) // 只在房间数量变化时重新加载，忽略loadShelves依赖
 
   const hasActiveFilters =
     plantFilters.search ||
@@ -331,7 +327,8 @@ const Plants = () => {
           onReorderShelves={handleReorderShelves}
           onCreatePlant={(_roomId, shelfId) => {
             if (shelfId) {
-              console.log('Create plant in shelf:', shelfId)
+              // 从花架添加植物 - 暂时还是打开普通表单，后端会自动分配到默认花架
+              openPlantModal()
             } else {
               openPlantModal()
             }
