@@ -5,7 +5,6 @@ import {
   CalendarOutlined,
   EnvironmentOutlined,
   HeartOutlined,
-  ExclamationCircleOutlined,
   PictureOutlined,
 } from '@ant-design/icons'
 import dayjs from 'dayjs'

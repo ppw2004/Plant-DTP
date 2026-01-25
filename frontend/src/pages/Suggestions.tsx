@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Card, Form, Input, Select, Button, message, Space, Divider, Tag, Empty } from 'antd'
-import { PlusOutlined, MessageOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { PlusOutlined, MessageOutlined } from '@ant-design/icons'
 import { useSuggestions, useCreateSuggestion } from '../hooks/useSuggestions'
-import type { Suggestion } from '../types/api'
 
 const { TextArea } = Input
 
@@ -148,7 +147,7 @@ const Suggestions = () => {
         </Card>
       ) : (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          {suggestions.map((suggestion) => {
+          {suggestions.map((suggestion: any) => {
             const statusInfo = STATUS_MAP[suggestion.status] || { text: suggestion.status, color: 'default' }
             const priorityInfo = PRIORITY_MAP[suggestion.priority] || { text: suggestion.priority, color: 'default' }
 

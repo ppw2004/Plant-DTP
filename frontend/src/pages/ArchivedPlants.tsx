@@ -1,9 +1,8 @@
 import { Button, Input, Space, Tag, Empty, Card, Row, Col, message, Popconfirm } from 'antd'
-import { ReloadOutlined, SearchOutlined, UndoOutlined, DeleteOutlined } from '@ant-design/icons'
-import { useState, useEffect } from 'react'
+import { ReloadOutlined, UndoOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getArchivedPlants, restorePlant, permanentDeletePlant } from '../services/plantService'
-import PlantCard from '../components/PlantCard'
 import type { Plant } from '../types/api'
 
 const ArchivedPlants = () => {

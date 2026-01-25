@@ -1,6 +1,6 @@
 import { Collapse, Card, Row, Col, Space, Button, Typography, Empty, Tag } from 'antd'
 import { PlusOutlined, ArrowRightOutlined } from '@ant-design/icons'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import {
   DndContext,
   closestCenter,

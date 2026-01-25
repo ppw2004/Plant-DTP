@@ -50,16 +50,16 @@ export const useUpdatePlant = () => {
   })
 }
 
-// Delete plant
+// Archive plant (soft delete)
 export const useDeletePlant = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: number) => plantService.deletePlant(id),
+    mutationFn: (id: number) => plantService.archivePlant(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plants'] })
       queryClient.invalidateQueries({ queryKey: ['roomStats'] })
-      message.success('植物删除成功')
+      message.success('植物已归档')
     },
   })
 }
