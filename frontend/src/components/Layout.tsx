@@ -1,18 +1,25 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Layout as AntLayout, Menu, theme } from 'antd'
-import { HomeOutlined, FolderOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { HomeOutlined, FolderOutlined, InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons'
 
 const { Header, Content, Sider } = AntLayout
 
-const Layout = () => {
+interface LayoutProps {
+  children?: React.ReactNode
+}
+
+const Layout = ({ children }: LayoutProps) => {
+  const navigate = useNavigate()
+  const location = useLocation()
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken()
 
   const menuItems = [
-    { key: '/', icon: <HomeOutlined />, label: '首页' },
-    { key: '/plants', icon: <InfoCircleOutlined />, label: '植物' },
+    { key: '/', icon: <HomeOutlined />, label: '仪表板' },
     { key: '/rooms', icon: <FolderOutlined />, label: '房间' },
+    { key: '/plants', icon: <InfoCircleOutlined />, label: '植物' },
+    { key: '/tasks', icon: <CheckCircleOutlined />, label: '任务' },
   ]
 
   return (
@@ -25,7 +32,13 @@ const Layout = () => {
         <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }}>
           <h2 style={{ color: '#fff', textAlign: 'center', marginTop: '20px' }}>🌿 植物管家</h2>
         </div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['/']} items={menuItems} />
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
+          onClick={({ key }) => navigate(key)}
+        />
       </Sider>
       <AntLayout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
@@ -40,7 +53,7 @@ const Layout = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            <Outlet />
+            {children || <Outlet />}
           </div>
         </Content>
       </AntLayout>
