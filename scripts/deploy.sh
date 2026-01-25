@@ -9,7 +9,7 @@ set -e  # 遇到错误立即退出
 SERVER_IP="82.156.213.38"
 SERVER_USER="root"  # 可改为其他用户
 REMOTE_DIR="/var/www/plant-dtp"
-FRONTEND_DIR="./dist"
+FRONTEND_DIR="./frontend/dist"
 
 echo "==================================="
 echo "植物数字孪生平台 - 自动化部署脚本"
@@ -25,14 +25,6 @@ if [ ! -d "$FRONTEND_DIR" ]; then
 fi
 
 echo "✅ 找到构建文件: $FRONTEND_DIR"
-
-# 询问是否继续
-read -p "是否继续部署到 $SERVER_IP? (y/n) " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-  echo "部署已取消"
-  exit 0
-fi
 
 echo ""
 echo "📦 开始部署..."

@@ -1,5 +1,26 @@
 # 腾讯云服务器部署指南
 
+## 快速开始
+
+> **5分钟快速部署到 82.156.213.38**
+
+```bash
+# 1. 本地构建前端
+cd frontend && npm run build
+
+# 2. 上传到服务器
+rsync -avz dist/ root@82.156.213.38:/var/www/plant-dtp/
+
+# 3. SSH到服务器配置Nginx
+ssh root@82.156.213.38
+# 复制下面的Nginx配置并重启服务
+
+# 4. 访问部署的网站
+# http://82.156.213.38
+```
+
+---
+
 ## 服务器信息
 - **IP地址**: 82.156.213.38
 - **操作系统**: Linux (假设是Ubuntu/Debian/CentOS)
@@ -152,24 +173,33 @@ chmod +x deploy.sh
 
 确保后端允许来自服务器域名的跨域请求。
 
-编辑 `/home/pengpeiwen/Plant-DTP/backend/app/main.py`:
+**方法1：修改配置文件（推荐）**
+
+编辑 `backend/app/core/config.py`，在 `ALLOWED_ORIGINS` 列表中添加生产服务器：
 
 ```python
-# CORS配置
-origins = [
-    "http://82.156.213.38",
-    "http://localhost:12800",  # 开发环境
-    # 添加你的域名
+ALLOWED_ORIGINS: List[str] = [
+    "http://localhost:12800",
+    "http://localhost:5173",
+    "http://localhost:12801",
+    "http://82.156.213.38",  # 生产环境服务器
+    "http://82.156.213.38:80",  # 生产环境80端口
+    "https://yourdomain.com",  # 如果有域名（使用HTTPS）
 ]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 ```
+
+**方法2：使用环境变量**
+
+在服务器的 `.env` 文件中设置（如果使用环境变量覆盖）：
+
+```bash
+# .env文件
+ALLOWED_ORIGINS='["http://82.156.213.38","http://localhost:12800"]'
+```
+
+**注意**：
+- 配置修改后需要重启后端服务
+- 如果配置了HTTPS，需要添加 `https://` 开头的域名
 
 ## 部署后端
 
