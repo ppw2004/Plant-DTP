@@ -1,0 +1,41 @@
+# FastAPI和服务器
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.9
+
+# 数据库
+sqlalchemy==2.0.25
+alembic==1.13.1
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
+
+# 数据验证
+pydantic==2.6.1
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# 安全
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.9
+
+# CORS
+python-cors==1.0.0
+
+# 工具
+python-dotenv==1.0.1
+orjson==3.9.12
+
+# 图片处理
+Pillow==10.2.0
+
+# 日期处理
+python-dateutil==2.8.2
+
+# 日志
+loguru==0.7.2
+
+# AI库（可选，后期集成）
+# openai==1.10.0
+# transformers==4.37.2
+# torch==2.1.2

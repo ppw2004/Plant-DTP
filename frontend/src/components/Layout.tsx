@@ -1,0 +1,51 @@
+import { Outlet } from 'react-router-dom'
+import { Layout as AntLayout, Menu, theme } from 'antd'
+import { HomeOutlined, FolderOutlined, InfoCircleOutlined } from '@ant-design/icons'
+
+const { Header, Content, Sider } = AntLayout
+
+const Layout = () => {
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken()
+
+  const menuItems = [
+    { key: '/', icon: <HomeOutlined />, label: '首页' },
+    { key: '/plants', icon: <InfoCircleOutlined />, label: '植物' },
+    { key: '/rooms', icon: <FolderOutlined />, label: '房间' },
+  ]
+
+  return (
+    <AntLayout style={{ minHeight: '100vh' }}>
+      <Sider
+        breakpoint="lg"
+        collapsedWidth="0"
+        style={{ background: colorBgContainer }}
+      >
+        <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }}>
+          <h2 style={{ color: '#fff', textAlign: 'center', marginTop: '20px' }}>🌿 植物管家</h2>
+        </div>
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['/']} items={menuItems} />
+      </Sider>
+      <AntLayout>
+        <Header style={{ padding: 0, background: colorBgContainer }}>
+          <h1 style={{ padding: '0 24px', margin: '16px 0' }}>植物数字孪生平台</h1>
+        </Header>
+        <Content style={{ margin: '24px 16px 0' }}>
+          <div
+            style={{
+              padding: 24,
+              minHeight: 360,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
+            <Outlet />
+          </div>
+        </Content>
+      </AntLayout>
+    </AntLayout>
+  )
+}
+
+export default Layout
