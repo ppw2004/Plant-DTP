@@ -19,6 +19,7 @@ async def get_plants(
     search: Optional[str] = None,
     skip: int = 0,
     limit: int = 20,
+    is_active: Optional[bool] = True,
     db: Session = Depends(get_db)
 ):
     """
@@ -27,21 +28,26 @@ async def get_plants(
     - **room_id**: 可选，筛选房间ID
     - **health_status**: 可选，健康状态筛选
     - **search**: 可选，搜索关键词
+    - **is_active**: 可选，是否只获取活跃植物（默认true），设为false获取归档植物
     - **skip**: 跳过记录数
     - **limit**: 返回记录数
     """
     service = PlantService(db)
+    # 如果is_active参数被明确指定
+    active_filter = is_active if is_active is not None else True
     plants = service.get_plants(
         room_id=room_id,
         health_status=health_status,
         search=search,
         skip=skip,
-        limit=limit
+        limit=limit,
+        is_active=active_filter
     )
     total = service.count_plants(
         room_id=room_id,
         health_status=health_status,
-        search=search
+        search=search,
+        is_active=active_filter
     )
 
     return {
@@ -121,17 +127,52 @@ async def update_plant(
 
 
 @router.delete("/{plant_id}")
-async def delete_plant(
+async def archive_plant(
     plant_id: int,
     db: Session = Depends(get_db)
 ):
-    """删除植物"""
+    """归档植物（软删除，可恢复）"""
     service = PlantService(db)
-    success = service.delete_plant(plant_id)
+    success = service.archive_plant(plant_id)
     if not success:
         raise HTTPException(status_code=404, detail="植物不存在")
 
     return {
         "success": True,
-        "message": "植物已删除"
+        "message": "植物已归档"
+    }
+
+
+@router.post("/{plant_id}/restore")
+async def restore_plant(
+    plant_id: int,
+    db: Session = Depends(get_db)
+):
+    """恢复归档的植物"""
+    service = PlantService(db)
+    plant = service.restore_plant(plant_id)
+    if not plant:
+        raise HTTPException(status_code=404, detail="植物不存在")
+
+    return {
+        "success": True,
+        "data": plant,
+        "message": "植物已恢复"
+    }
+
+
+@router.delete("/{plant_id}/permanent")
+async def permanent_delete_plant(
+    plant_id: int,
+    db: Session = Depends(get_db)
+):
+    """永久删除植物（不可恢复）"""
+    service = PlantService(db)
+    success = service.permanent_delete_plant(plant_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="植物不存在")
+
+    return {
+        "success": True,
+        "message": "植物已永久删除"
     }

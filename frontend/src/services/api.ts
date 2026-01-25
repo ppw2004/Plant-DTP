@@ -29,7 +29,7 @@ function toSnakeCase(obj: any): any {
 
 // Create axios instance
 export const api = axios.create({
-  baseURL: 'http://localhost:12801/api/v1',
+  baseURL: '/api/v1',  // 使用相对路径，通过vite proxy或nginx代理
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',

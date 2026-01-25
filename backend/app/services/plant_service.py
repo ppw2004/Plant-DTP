@@ -12,9 +12,10 @@ class PlantService:
         self.db = db
 
     def get_plants(self, room_id: Optional[int] = None, health_status: Optional[str] = None,
-                   search: Optional[str] = None, skip: int = 0, limit: int = 20) -> List[dict]:
+                   search: Optional[str] = None, skip: int = 0, limit: int = 20,
+                   is_active: bool = True) -> List[dict]:
         """获取植物列表"""
-        query = self.db.query(Plant)
+        query = self.db.query(Plant).filter(Plant.is_active == is_active)
         if room_id:
             query = query.filter(Plant.room_id == room_id)
         if health_status:
@@ -25,9 +26,9 @@ class PlantService:
         return [plant.to_dict() for plant in plants]
 
     def count_plants(self, room_id: Optional[int] = None, health_status: Optional[str] = None,
-                     search: Optional[str] = None) -> int:
+                     search: Optional[str] = None, is_active: bool = True) -> int:
         """统计植物数量"""
-        query = self.db.query(Plant)
+        query = self.db.query(Plant).filter(Plant.is_active == is_active)
         if room_id:
             query = query.filter(Plant.room_id == room_id)
         if health_status:
@@ -82,8 +83,27 @@ class PlantService:
         self.db.refresh(plant)
         return plant.to_dict()
 
-    def delete_plant(self, plant_id: int) -> bool:
-        """删除植物"""
+    def archive_plant(self, plant_id: int) -> bool:
+        """归档植物（软删除）"""
+        plant = self.db.query(Plant).filter(Plant.id == plant_id).first()
+        if not plant:
+            return False
+        plant.is_active = False
+        self.db.commit()
+        return True
+
+    def restore_plant(self, plant_id: int) -> Optional[dict]:
+        """恢复归档的植物"""
+        plant = self.db.query(Plant).filter(Plant.id == plant_id).first()
+        if not plant:
+            return None
+        plant.is_active = True
+        self.db.commit()
+        self.db.refresh(plant)
+        return plant.to_dict()
+
+    def permanent_delete_plant(self, plant_id: int) -> bool:
+        """永久删除植物"""
         plant = self.db.query(Plant).filter(Plant.id == plant_id).first()
         if not plant:
             return False

@@ -93,20 +93,18 @@ const PlantCard = ({ plant, onEdit, onDelete, onManageCare, onManageImages }: Pl
         </Button>,
         <Popconfirm
           key="delete"
-          title="删除植物"
+          title="归档植物"
           description={
             hasImages
-              ? `该植物还有 ${imageCount} 张图片，删除后图片将无法恢复。`
-              : '确定要删除这个植物吗？'
+              ? `该植物还有 ${imageCount} 张图片。归档后可在归档库中恢复或永久删除。`
+              : '归档后可在归档库中恢复或永久删除。'
           }
-          icon={hasImages ? <ExclamationCircleOutlined /> : undefined}
-          okText="确定"
+          okText="归档"
           cancelText="取消"
-          okButtonProps={hasImages ? { danger: true } : undefined}
           onConfirm={() => onDelete(plant.id)}
         >
           <Button type="text" danger icon={<DeleteOutlined />}>
-            删除
+            归档
           </Button>
         </Popconfirm>,
       ]}
