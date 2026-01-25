@@ -4,7 +4,7 @@
 """
 from sqlalchemy import create_engine, text
 from app.core.config import settings
-from app.models import room, plant, task_type
+from app.models import room, plant, task_type, plant_image, plant_config
 from app.core.database import Base
 
 

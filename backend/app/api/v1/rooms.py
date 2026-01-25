@@ -8,6 +8,7 @@ from typing import List
 from app.core.database import get_db
 from app.schemas.room import RoomCreate, RoomUpdate, RoomResponse, RoomListResponse
 from app.services.room_service import RoomService
+from app.models.plant import Plant
 
 router = APIRouter()
 
@@ -127,3 +128,33 @@ async def delete_room(
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/{room_id}/stats")
+async def get_room_stats(
+    room_id: int,
+    db: Session = Depends(get_db)
+):
+    """获取房间统计信息"""
+    # 验证房间存在
+    service = RoomService(db)
+    room = service.get_room(room_id)
+    if not room:
+        raise HTTPException(status_code=404, detail="房间不存在")
+
+    # 统计植物数量
+    total_plants = db.query(Plant).filter(Plant.room_id == room_id).count()
+    active_plants = db.query(Plant).filter(
+        Plant.room_id == room_id,
+        Plant.is_active == True
+    ).count()
+
+    return {
+        "success": True,
+        "data": {
+            "roomId": room_id,
+            "roomName": room["name"],
+            "totalPlants": total_plants,
+            "activePlants": active_plants
+        }
+    }

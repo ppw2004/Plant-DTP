@@ -4,6 +4,7 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.models.plant import Plant
+from app.models.plant_shelf import PlantShelf
 
 
 class PlantService:
@@ -41,8 +42,30 @@ class PlantService:
         return plant.to_dict() if plant else None
 
     def create_plant(self, plant_data) -> dict:
-        """创建植物"""
+        """创建植物（自动分配到默认花架）"""
+        # 创建植物对象
         new_plant = Plant(**plant_data.dict())
+
+        # 如果没有指定花架，自动分配到房间的默认花架
+        if new_plant.shelf_id is None:
+            default_shelf = (
+                self.db.query(PlantShelf)
+                .filter(
+                    PlantShelf.room_id == new_plant.room_id,
+                    PlantShelf.is_default == True
+                )
+                .first()
+            )
+            if default_shelf:
+                # 获取当前最大的order
+                max_order = (
+                    self.db.query(Plant)
+                    .filter(Plant.shelf_id == default_shelf.id)
+                    .count()
+                )
+                new_plant.shelf_id = default_shelf.id
+                new_plant.shelf_order = max_order
+
         self.db.add(new_plant)
         self.db.commit()
         self.db.refresh(new_plant)

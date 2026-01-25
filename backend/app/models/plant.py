@@ -11,6 +11,8 @@ class Plant(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     room_id = Column(Integer, ForeignKey("rooms.id"), nullable=False)
+    shelf_id = Column(Integer, ForeignKey("plant_shelves.id", ondelete="SET NULL"), nullable=True)
+    shelf_order = Column(Integer, default=0, nullable=False)
     name = Column(String(100), nullable=False)
     scientific_name = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
@@ -22,6 +24,8 @@ class Plant(Base):
         return {
             "id": self.id,
             "roomId": self.room_id,
+            "shelfId": self.shelf_id,
+            "shelfOrder": self.shelf_order,
             "name": self.name,
             "scientificName": self.scientific_name,
             "description": self.description,

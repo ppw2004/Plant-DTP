@@ -4,12 +4,21 @@ FastAPI应用主入口
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import logging
+from pathlib import Path
 
 from app.core.config import settings
 from app.api.v1 import api_router
 from app.core.database import engine, Base
+
+# 导入所有模型（确保它们注册到 Base.metadata）
+# 顺序很重要：先导入被引用的表，后导入引用其他表的表
+from app.models import room, task_type  # 基础表，无外键
+from app.models import plant_shelf  # 依赖 room
+from app.models import plant  # 依赖 room 和 plant_shelf
+from app.models import plant_image, plant_config  # 依赖 plant 和 task_type
 
 # 配置日志
 logging.basicConfig(
@@ -28,6 +37,10 @@ async def lifespan(app: FastAPI):
     if settings.ENVIRONMENT == "development":
         Base.metadata.create_all(bind=engine)
         logger.info("✅ Database tables created")
+    # 创建上传目录
+    upload_dir = Path("uploads/plants")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    logger.info(f"✅ Upload directory ready: {upload_dir.absolute()}")
     yield
     # 关闭时
     logger.info("👋 Shutting down Plant DTP API...")
@@ -78,6 +91,11 @@ async def health_check():
 
 # 注册API路由
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
+# 挂载静态文件服务
+uploads_dir = Path("uploads")
+uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
 
 
 # 全局异常处理
