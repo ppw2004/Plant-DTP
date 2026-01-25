@@ -301,9 +301,228 @@ GET /api/resource?page=1&limit=20&sortBy=createdAt&order=desc
 
 ---
 
-## 4. 植物管理模块
+## 4. 花架管理模块
 
-### 4.1 获取植物列表
+### 4.1 获取房间的所有花架
+
+**接口**: `GET /rooms/:roomId/shelves`
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "roomId": 1,
+        "name": "默认花架",
+        "description": "房间的默认花架",
+        "sortOrder": 0,
+        "capacity": 100,
+        "isActive": true,
+        "isDefault": true
+      },
+      {
+        "id": 2,
+        "roomId": 1,
+        "name": "窗边花架",
+        "description": "朝南窗边的花架",
+        "sortOrder": 1,
+        "capacity": 10,
+        "isActive": true,
+        "isDefault": false
+      }
+    ]
+  }
+}
+```
+
+### 4.2 获取单个花架及其植物
+
+**接口**: `GET /shelves/:shelfId`
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "id": 2,
+    "roomId": 1,
+    "name": "窗边花架",
+    "description": "朝南窗边的花架",
+    "sortOrder": 1,
+    "capacity": 10,
+    "isActive": true,
+    "isDefault": false,
+    "plants": [
+      {
+        "id": 1,
+        "name": "绿萝",
+        "shelfOrder": 0,
+        "healthStatus": "healthy"
+      },
+      {
+        "id": 2,
+        "name": "龟背竹",
+        "shelfOrder": 1,
+        "healthStatus": "healthy"
+      }
+    ]
+  }
+}
+```
+
+### 4.3 创建花架
+
+**接口**: `POST /rooms/:roomId/shelves`
+
+**请求体**:
+```json
+{
+  "name": "阳台花架",
+  "description": "东侧阳台的花架",
+  "capacity": 15
+}
+```
+
+**响应**: `201 Created`
+```json
+{
+  "success": true,
+  "data": {
+    "id": 3,
+    "roomId": 1,
+    "name": "阳台花架",
+    "description": "东侧阳台的花架",
+    "sortOrder": 2,
+    "capacity": 15,
+    "isActive": true,
+    "isDefault": false
+  },
+  "message": "花架创建成功"
+}
+```
+
+### 4.4 更新花架
+
+**接口**: `PATCH /shelves/:shelfId`
+
+**请求体**:
+```json
+{
+  "name": "窗边花架（改造后）",
+  "description": "已加装补光灯",
+  "capacity": 12
+}
+```
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "id": 2,
+    "roomId": 1,
+    "name": "窗边花架（改造后）",
+    "description": "已加装补光灯",
+    "sortOrder": 1,
+    "capacity": 12,
+    "isActive": true,
+    "isDefault": false
+  },
+  "message": "花架更新成功"
+}
+```
+
+### 4.5 删除花架
+
+**接口**: `DELETE /shelves/:shelfId`
+
+**响应**: `204 No Content`
+
+**注意**:
+- 默认花架不能删除
+- 删除花架后，该花架上的植物的 shelf_id 会被设为 NULL
+
+### 4.6 重新排序房间的花架
+
+**接口**: `POST /rooms/:roomId/shelves/reorder`
+
+**请求体**:
+```json
+[2, 3, 1]
+```
+
+**说明**: 提供花架ID列表，按新顺序排列
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "message": "花架排序已更新"
+}
+```
+
+**注意**: 默认花架不参与排序，始终在第一位
+
+### 4.7 移动植物到花架
+
+**接口**: `POST /plants/:plantId/move`
+
+**请求参数**:
+- `shelfId`: 目标花架ID（null表示移出花架）
+- `newOrder`: 新位置顺序（可选，默认为最后）
+
+**请求体**:
+```json
+{
+  "shelfId": 2,
+  "newOrder": 0
+}
+```
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "roomId": 1,
+    "shelfId": 2,
+    "shelfOrder": 0,
+    "name": "绿萝"
+  },
+  "message": "植物已移动"
+}
+```
+
+### 4.8 重新排序花架上的植物
+
+**接口**: `POST /shelves/:shelfId/plants/reorder`
+
+**请求体**:
+```json
+[
+  {"plantId": 1, "order": 0},
+  {"plantId": 3, "order": 1},
+  {"plantId": 2, "order": 2}
+]
+```
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "message": "植物排序已更新"
+}
+```
+
+---
+
+## 5. 植物管理模块
+
+### 5.1 获取植物列表
 
 **接口**: `GET /plants`
 
@@ -353,7 +572,7 @@ GET /api/resource?page=1&limit=20&sortBy=createdAt&order=desc
 }
 ```
 
-### 4.2 创建植物
+### 5.2 创建植物
 
 **接口**: `POST /plants`
 
@@ -404,7 +623,7 @@ GET /api/resource?page=1&limit=20&sortBy=createdAt&order=desc
 }
 ```
 
-### 4.3 获取植物详情
+### 5.3 获取植物详情
 
 **接口**: `GET /plants/:id`
 
@@ -471,7 +690,7 @@ GET /api/resource?page=1&limit=20&sortBy=createdAt&order=desc
 }
 ```
 
-### 4.4 更新植物
+### 5.4 更新植物
 
 **接口**: `PATCH /plants/:id`
 
@@ -508,13 +727,13 @@ GET /api/resource?page=1&limit=20&sortBy=createdAt&order=desc
 }
 ```
 
-### 4.5 删除植物
+### 5.5 删除植物
 
 **接口**: `DELETE /plants/:id`
 
 **响应**: `204 No Content`
 
-### 4.6 批量操作植物
+### 5.6 批量操作植物
 
 **接口**: `PATCH /plants/batch`
 
@@ -547,9 +766,9 @@ GET /api/resource?page=1&limit=20&sortBy=createdAt&order=desc
 
 ---
 
-## 5. 植物图片模块
+## 6. 植物图片模块
 
-### 5.1 上传图片
+### 6.1 上传图片
 
 **接口**: `POST /plants/:plantId/images`
 
@@ -581,7 +800,7 @@ isPrimary: true
 }
 ```
 
-### 5.2 设置主图
+### 6.2 设置主图
 
 **接口**: `PATCH /plants/:plantId/images/:imageId/primary`
 
@@ -596,7 +815,7 @@ isPrimary: true
 }
 ```
 
-### 5.3 删除图片
+### 6.3 删除图片
 
 **接口**: `DELETE /plants/:plantId/images/:imageId`
 
@@ -604,9 +823,9 @@ isPrimary: true
 
 ---
 
-## 6. 任务类型模块
+## 7. 任务类型模块
 
-### 6.1 获取任务类型列表
+### 7.1 获取任务类型列表
 
 **接口**: `GET /task-types`
 
@@ -647,7 +866,7 @@ isPrimary: true
 }
 ```
 
-### 6.2 创建自定义任务类型
+### 7.2 创建自定义任务类型
 
 **接口**: `POST /task-types`
 
@@ -667,9 +886,9 @@ isPrimary: true
 
 ---
 
-## 7. 植物养护配置模块
+## 8. 植物养护配置模块
 
-### 7.1 获取植物的养护配置
+### 8.1 获取植物的养护配置
 
 **接口**: `GET /plants/:plantId/configs`
 
@@ -702,7 +921,7 @@ isPrimary: true
 }
 ```
 
-### 7.2 创建养护配置
+### 8.2 创建养护配置
 
 **接口**: `POST /plants/:plantId/configs`
 
@@ -740,7 +959,7 @@ isPrimary: true
 }
 ```
 
-### 7.3 更新养护配置
+### 8.3 更新养护配置
 
 **接口**: `PATCH /plants/:plantId/configs/:configId`
 
@@ -754,7 +973,7 @@ isPrimary: true
 
 **响应**: `200 OK`
 
-### 7.4 删除养护配置
+### 8.4 删除养护配置
 
 **接口**: `DELETE /plants/:plantId/configs/:configId`
 
@@ -762,9 +981,9 @@ isPrimary: true
 
 ---
 
-## 8. 养护记录模块
+## 9. 养护记录模块
 
-### 8.1 获取养护记录列表
+### 9.1 获取养护记录列表
 
 **接口**: `GET /care-logs`
 
@@ -808,7 +1027,7 @@ isPrimary: true
 }
 ```
 
-### 8.2 获取植物的养护历史
+### 9.2 获取植物的养护历史
 
 **接口**: `GET /plants/:plantId/care-logs`
 
@@ -849,7 +1068,7 @@ isPrimary: true
 }
 ```
 
-### 8.3 记录养护操作
+### 9.3 记录养护操作
 
 **接口**: `POST /care-logs`
 
@@ -901,7 +1120,7 @@ isPrimary: true
 
 **注意**: 创建养护记录后，系统会自动更新对应的`plant_configs`（`lastDoneAt`和`nextDueAt`）
 
-### 8.4 快速记录（推荐使用）
+### 9.4 快速记录（推荐使用）
 
 **接口**: `POST /plants/:plantId/care-logs/quick`
 
@@ -917,7 +1136,7 @@ isPrimary: true
 
 **响应**: `201 Created`
 
-### 8.5 更新养护记录
+### 9.5 更新养护记录
 
 **接口**: `PATCH /care-logs/:logId`
 
@@ -931,7 +1150,7 @@ isPrimary: true
 
 **响应**: `200 OK`
 
-### 8.6 删除养护记录
+### 9.6 删除养护记录
 
 **接口**: `DELETE /care-logs/:logId`
 
@@ -939,9 +1158,9 @@ isPrimary: true
 
 ---
 
-## 9. 任务提醒模块
+## 10. 任务提醒模块
 
-### 9.1 获取今日任务
+### 10.1 获取今日任务
 
 **接口**: `GET /tasks/today`
 
@@ -981,7 +1200,7 @@ isPrimary: true
 }
 ```
 
-### 9.2 获取即将到期任务
+### 10.2 获取即将到期任务
 
 **接口**: `GET /tasks/upcoming`
 
@@ -1017,7 +1236,7 @@ isPrimary: true
 }
 ```
 
-### 9.3 获取逾期任务
+### 10.3 获取逾期任务
 
 **接口**: `GET /tasks/overdue`
 
@@ -1048,7 +1267,7 @@ isPrimary: true
 }
 ```
 
-### 9.4 快速完成任务
+### 10.4 快速完成任务
 
 **接口**: `POST /tasks/:taskId/complete`
 
@@ -1066,9 +1285,9 @@ isPrimary: true
 
 ---
 
-## 10. 统计分析模块
+## 11. 统计分析模块
 
-### 10.1 获取仪表盘数据
+### 11.1 获取仪表盘数据
 
 **接口**: `GET /stats/dashboard`
 
@@ -1120,7 +1339,7 @@ isPrimary: true
 }
 ```
 
-### 10.2 获取养护统计
+### 11.2 获取养护统计
 
 **接口**: `GET /stats/care`
 
@@ -1167,7 +1386,7 @@ isPrimary: true
 }
 ```
 
-### 10.3 获取植物健康度报告
+### 11.3 获取植物健康度报告
 
 **接口**: `GET /stats/health-report`
 
@@ -1196,9 +1415,9 @@ isPrimary: true
 
 ---
 
-## 11. 导出模块
+## 12. 导出模块
 
-### 11.1 导出植物清单
+### 12.1 导出植物清单
 
 **接口**: `GET /exports/plants`
 
@@ -1217,7 +1436,7 @@ Content-Disposition: attachment; filename="plants_20241201.xlsx"
 <binary file>
 ```
 
-### 11.2 导出养护记录
+### 12.2 导出养护记录
 
 **接口**: `GET /exports/care-logs`
 
@@ -1234,7 +1453,7 @@ Content-Disposition: attachment; filename="care_logs_20241201.csv"
 <binary file>
 ```
 
-### 11.3 导出养护报告
+### 12.3 导出养护报告
 
 **接口**: `POST /exports/care-report`
 
@@ -1260,9 +1479,9 @@ Content-Disposition: attachment; filename="care_report_20241201.pdf"
 
 ---
 
-## 12. 系统配置模块
+## 13. 系统配置模块
 
-### 12.1 获取系统配置
+### 13.1 获取系统配置
 
 **接口**: `GET /settings`
 
@@ -1282,7 +1501,7 @@ Content-Disposition: attachment; filename="care_report_20241201.pdf"
 }
 ```
 
-### 12.2 更新系统配置
+### 13.2 更新系统配置
 
 **接口**: `PATCH /settings`
 
@@ -1301,7 +1520,7 @@ Content-Disposition: attachment; filename="care_report_20241201.pdf"
 
 ---
 
-## 13. 错误码说明
+## 14. 错误码说明
 
 | 错误码 | 说明 | HTTP状态码 |
 |--------|------|-----------|
@@ -1337,9 +1556,9 @@ Content-Disposition: attachment; filename="care_report_20241201.pdf"
 
 ---
 
-## 14. 数据模型（TypeScript）
+## 15. 数据模型（TypeScript）
 
-### 14.1 核心类型定义
+### 15.1 核心类型定义
 
 ```typescript
 // 通用类型
@@ -1544,9 +1763,9 @@ interface DashboardStats {
 
 ---
 
-## 15. 使用示例
+## 16. 使用示例
 
-### 15.1 创建完整的植物记录
+### 16.1 创建完整的植物记录
 
 ```bash
 # 1. 创建房间
@@ -1578,7 +1797,7 @@ curl -X POST http://localhost:3000/api/plants/1/images \
   -F "isPrimary=true"
 ```
 
-### 15.2 记录养护操作
+### 16.2 记录养护操作
 
 ```bash
 # 方式1: 完整记录
@@ -1607,7 +1826,7 @@ curl -X POST http://localhost:3000/api/tasks/5/complete \
   }'
 ```
 
-### 15.3 查询即将到期的任务
+### 16.3 查询即将到期的任务
 
 ```bash
 # 查询今日任务
@@ -1622,19 +1841,19 @@ curl http://localhost:3000/api/tasks/overdue
 
 ---
 
-## 16. API测试工具推荐
+## 17. API测试工具推荐
 
-### 16.1 Thunder Client（VS Code插件）
+### 17.1 Thunder Client（VS Code插件）
 - 安装插件：`Thunder Client`
 - 导入API集合
 - 保存环境变量
 
-### 16.2 Postman
+### 17.2 Postman
 - 导入JSON格式的API定义
 - 使用环境变量管理不同环境
 - 自动化测试脚本
 
-### 16.3 示例环境变量
+### 17.3 示例环境变量
 
 ```json
 {
@@ -1645,17 +1864,17 @@ curl http://localhost:3000/api/tasks/overdue
 
 ---
 
-## 17. WebSocket接口（可选）
+## 18. WebSocket接口（可选）
 
 如需实时更新任务提醒，可使用WebSocket：
 
-### 17.1 连接
+### 18.1 连接
 
 ```
 ws://localhost:3000/ws
 ```
 
-### 17.2 订阅任务更新
+### 18.2 订阅任务更新
 
 **客户端发送**:
 ```json
@@ -1680,7 +1899,7 @@ ws://localhost:3000/ws
 
 ---
 
-## 18. 开发计划
+## 19. 开发计划
 
 ### MVP阶段API（V1.0）
 - ✅ 房间管理 CRUD
