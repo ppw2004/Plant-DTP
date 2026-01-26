@@ -303,3 +303,5 @@ dump.sql
 !.gitignore
 README.md
 LICENSE
+*.log
+nohup.out

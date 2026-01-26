@@ -4,7 +4,8 @@ API v1 路由聚合
 from fastapi import APIRouter
 from app.api.v1 import rooms, plants, tasks, images, configs, task_types, shelves, suggestions
 
-api_router = APIRouter()
+# 禁用自动斜杠重定向，避免外部访问时的localhost重定向问题
+api_router = APIRouter(redirect_slashes=False)
 
 # 注册各个模块的路由
 api_router.include_router(

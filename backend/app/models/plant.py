@@ -20,8 +20,17 @@ class Plant(Base):
     health_status = Column(String(20), default="healthy")
     is_active = Column(Boolean, default=True)
 
-    def to_dict(self):
-        return {
+    def to_dict(self, include_images=False, room_name=None):
+        """
+        转换为字典格式
+
+        Args:
+            include_images: 是否包含主图信息
+            room_name: 房间名称（需要在外部查询时传入）
+        """
+        from app.models.plant_image import PlantImage
+
+        data = {
             "id": self.id,
             "roomId": self.room_id,
             "shelfId": self.shelf_id,
@@ -33,3 +42,25 @@ class Plant(Base):
             "healthStatus": self.health_status,
             "isActive": self.is_active
         }
+
+        # 添加房间名称
+        if room_name:
+            data["roomName"] = room_name
+
+        # 添加主图信息
+        if include_images:
+            primary_image = self.db.query(PlantImage).filter(
+                PlantImage.plant_id == self.id,
+                PlantImage.is_primary == True
+            ).first()
+            if primary_image:
+                data["primaryImage"] = primary_image.to_dict()
+            else:
+                data["primaryImage"] = None
+
+            # 添加图片数量
+            data["imageCount"] = self.db.query(PlantImage).filter(
+                PlantImage.plant_id == self.id
+            ).count()
+
+        return data

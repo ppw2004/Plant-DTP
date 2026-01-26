@@ -12,7 +12,7 @@ from app.services.plant_service import PlantService
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 async def get_plants(
     room_id: Optional[int] = None,
     health_status: Optional[str] = None,
@@ -63,7 +63,7 @@ async def get_plants(
     }
 
 
-@router.post("/")
+@router.post("")
 async def create_plant(
     plant: PlantCreate,
     db: Session = Depends(get_db)

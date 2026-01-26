@@ -66,6 +66,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 请求日志中间件
+@app.middleware("http")
+async def log_requests(request, call_next):
+    import time
+    start_time = time.time()
+
+    # Log request details
+    logger.info(f"📥 {request.method} {request.url.path}")
+    if request.method in ["POST", "PUT", "PATCH"]:
+        content_type = request.headers.get("content-type", "")
+        logger.info(f"  Content-Type: {content_type}")
+        # Log form data
+        if content_type.startswith("multipart/form-data"):
+            logger.info(f"  Multipart form data detected")
+        elif content_type.startswith("application/json"):
+            logger.info(f"  JSON request")
+
+    response = await call_next(request)
+
+    process_time = (time.time() - start_time) * 1000
+    logger.info(f"📤 {request.method} {request.url.path} - Status: {response.status_code} - {process_time:.2f}ms")
+
+    return response
+
 
 # 健康检查
 @app.get("/")
@@ -112,6 +136,27 @@ async def global_exception_handler(request, exc):
                 "detail": str(exc) if settings.ENVIRONMENT == "development" else None
             }
         }
+    )
+
+
+# 捕获请求验证错误（422）
+from fastapi.exceptions import RequestValidationError
+from fastapi import status
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    logger.error(f"Validation error: {exc}")
+    logger.error(f"Request body: {exc.body}")
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "success": False,
+            "error": {
+                "code": "VALIDATION_ERROR",
+                "message": "请求参数验证失败",
+                "detail": str(exc)
+            }
+        },
     )
 
 

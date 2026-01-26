@@ -39,6 +39,19 @@ export const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Debug logging
+    console.log('API Request:', config.method?.toUpperCase(), config.url)
+    console.log('Request data type:', config.data?.constructor.name)
+    console.log('Is FormData?', config.data instanceof FormData)
+
+    // Don't convert FormData (used for file uploads)
+    if (config.data instanceof FormData) {
+      console.log('FormData entries:', Array.from((config.data as FormData).entries()))
+      // Remove Content-Type to let browser set it automatically with correct boundary
+      delete config.headers['Content-Type']
+      return config
+    }
+
     // Convert request data from camelCase to snake_case
     if (config.data && typeof config.data === 'object') {
       config.data = toSnakeCase(config.data)

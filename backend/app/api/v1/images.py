@@ -1,7 +1,7 @@
 """
 植物图片管理路由
 """
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import os
@@ -102,6 +102,7 @@ async def add_plant_image(
 @router.post("/plants/{plant_id}/images/upload", response_model=dict)
 async def upload_plant_image_file(
     plant_id: int,
+    request: Request,
     file: UploadFile = File(...),
     description: Optional[str] = Form(None),
     is_primary: Optional[bool] = Form(False),
@@ -109,7 +110,17 @@ async def upload_plant_image_file(
     db: Session = Depends(get_db)
 ):
     """上传植物图片文件"""
+    import logging
+    logger = logging.getLogger(__name__)
     from datetime import datetime
+
+    # Debug logging
+    logger.info(f"Upload request received:")
+    logger.info(f"  plant_id: {plant_id}")
+    logger.info(f"  file: {file}, filename: {file.filename if file else None}, content_type: {file.content_type if file else None}")
+    logger.info(f"  description: {description}")
+    logger.info(f"  is_primary: {is_primary}")
+    logger.info(f"  capture_date: {capture_date}")
 
     # Validate file type
     if file.content_type not in ALLOWED_MIME_TYPES:
@@ -136,8 +147,14 @@ async def upload_plant_image_file(
     with open(file_path, "wb") as f:
         f.write(content)
 
-    # Generate file URL
-    file_url = f"http://localhost:12801/uploads/plants/{filename}"
+    # Generate file URL (dynamic based on request)
+    if request:
+        # Get base URL from request (scheme + host + port)
+        base_url = f"{request.url.scheme}://{request.url.netloc}"
+        file_url = f"{base_url}/uploads/plants/{filename}"
+    else:
+        # Fallback to localhost (shouldn't happen in normal operation)
+        file_url = f"http://localhost:12801/uploads/plants/{filename}"
 
     # Parse capture date if provided
     parsed_capture_date = None

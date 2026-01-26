@@ -21,11 +21,8 @@ export const addImage = async (plantId: number, data: PlantImageFormData): Promi
 
 // Upload image file
 export const uploadImage = async (plantId: number, formData: FormData): Promise<PlantImage> => {
-  const response = await api.post<{ data: PlantImage }>(`/plants/${plantId}/images/upload`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  })
+  // Don't set Content-Type header - axios will set it automatically with correct boundary
+  const response = await api.post<{ data: PlantImage }>(`/plants/${plantId}/images/upload`, formData)
   return response.data.data
 }
 

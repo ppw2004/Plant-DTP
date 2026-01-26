@@ -8,7 +8,7 @@ import RoomFormModal from '../components/RoomFormModal'
 import type { Room, LocationType } from '../types/api'
 
 const LOCATION_OPTIONS = [
-  { label: '全部', value: null },
+  { label: '全部', value: '' },
   { label: '室内', value: 'indoor' },
   { label: '室外', value: 'outdoor' },
   { label: '阳台', value: 'balcony' },
@@ -50,12 +50,9 @@ const Rooms = () => {
         <Space>
           <Select
             style={{ width: 120 }}
-            value={roomLocationFilter}
-            onChange={(value) => setRoomLocationFilter(value as LocationType | null)}
-            options={LOCATION_OPTIONS.map((opt) => ({
-              label: opt.label,
-              value: opt.value as LocationType | null,
-            }))}
+            value={roomLocationFilter ?? ''}
+            onChange={(value) => setRoomLocationFilter(value as LocationType | '')}
+            options={LOCATION_OPTIONS}
             placeholder="筛选类型"
           />
           <Button icon={<ReloadOutlined />} onClick={() => refetch()}>

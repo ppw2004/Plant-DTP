@@ -1,0 +1,15 @@
+[Unit]
+Description=Plant DTP Backend
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=pengpeiwen
+WorkingDirectory=/home/pengpeiwen/Plant-DTP/backend
+Environment="PATH=/home/pengpeiwen/Plant-DTP/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/home/pengpeiwen/Plant-DTP/backend/venv/bin/python -m uvicorn app.main:app --port 12801 --host 0.0.0.0
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

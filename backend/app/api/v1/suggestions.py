@@ -12,7 +12,7 @@ from app.services.suggestion_service import SuggestionService
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 async def get_suggestions(
     skip: int = 0,
     limit: int = 50,
@@ -36,7 +36,7 @@ async def get_suggestions(
     }
 
 
-@router.post("/")
+@router.post("")
 async def create_suggestion(
     suggestion: SuggestionCreate,
     db: Session = Depends(get_db)

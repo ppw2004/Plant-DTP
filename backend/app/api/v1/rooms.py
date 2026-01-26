@@ -13,7 +13,7 @@ from app.models.plant import Plant
 router = APIRouter()
 
 
-@router.get("/", response_model=RoomListResponse)
+@router.get("", response_model=RoomListResponse)
 async def get_rooms(
     location_type: str = None,
     skip: int = 0,
@@ -44,7 +44,7 @@ async def get_rooms(
     }
 
 
-@router.post("/", response_model=RoomResponse)
+@router.post("", response_model=RoomResponse)
 async def create_room(
     room: RoomCreate,
     db: Session = Depends(get_db)

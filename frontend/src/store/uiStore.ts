@@ -28,8 +28,8 @@ interface UIState {
   clearPlantFilters: () => void
 
   // Room filter
-  roomLocationFilter: LocationType | null
-  setRoomLocationFilter: (filter: LocationType | null) => void
+  roomLocationFilter: LocationType | ''
+  setRoomLocationFilter: (filter: LocationType | '') => void
 
   // Image modal state
   imageModalVisible: boolean
@@ -79,7 +79,7 @@ export const useUIStore = create<UIState>((set) => ({
     }),
 
   // Room filter
-  roomLocationFilter: null,
+  roomLocationFilter: '',
   setRoomLocationFilter: (filter) => set({ roomLocationFilter: filter }),
 
   // Image modal state

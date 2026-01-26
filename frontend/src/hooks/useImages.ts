@@ -33,6 +33,11 @@ export const useAddImage = () => {
       queryClient.invalidateQueries({ queryKey: ['plant', variables.plantId] })
       message.success('图片添加成功')
     },
+    onError: (error: any) => {
+      console.error('Add image error:', error)
+      const errorMessage = error?.response?.data?.detail || error?.message || '图片添加失败'
+      message.error(errorMessage)
+    },
   })
 }
 
@@ -47,6 +52,24 @@ export const useUploadImage = () => {
       queryClient.invalidateQueries({ queryKey: ['plantImages', variables.plantId] })
       queryClient.invalidateQueries({ queryKey: ['plant', variables.plantId] })
       message.success('图片上传成功')
+    },
+    onError: (error: any) => {
+      console.error('Upload error:', error)
+      let errorMessage = '图片上传失败'
+
+      const detail = error?.response?.data?.detail
+      if (typeof detail === 'string') {
+        errorMessage = detail
+      } else if (Array.isArray(detail)) {
+        // FastAPI validation errors return array of objects with {type, loc, msg, input}
+        errorMessage = detail.map((err: any) => err.msg || '验证错误').join(', ')
+      } else if (detail?.msg) {
+        errorMessage = detail.msg
+      } else if (error?.message) {
+        errorMessage = error.message
+      }
+
+      message.error(errorMessage)
     },
   })
 }

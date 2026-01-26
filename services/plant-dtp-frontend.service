@@ -1,0 +1,19 @@
+[Unit]
+Description=Plant DTP Frontend (Development)
+After=network.target
+
+[Service]
+Type=simple
+User=pengpeiwen
+WorkingDirectory=/home/pengpeiwen/Plant-DTP/frontend
+Environment="PATH=/home/pengpeiwen/.nvm/versions/node/v24.13.0/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/home/pengpeiwen/.nvm/versions/node/v24.13.0/bin/npm run dev
+Restart=always
+RestartSec=10
+
+# 日志配置
+StandardOutput=append:/tmp/plant-frontend.log
+StandardError=append:/tmp/plant-frontend-error.log
+
+[Install]
+WantedBy=multi-user.target

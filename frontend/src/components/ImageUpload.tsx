@@ -59,14 +59,16 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
   }
 
   const handleUploadFile = () => {
+    console.log('handleUploadFile called, fileList:', fileList)
     if (fileList.length === 0) {
       message.warning('请选择要上传的图片')
       return
     }
 
     const file = fileList[0].originFileObj
+    console.log('originFileObj:', file)
     if (!file) {
-      message.error('文件选择失败')
+      message.error('文件选择失败：originFileObj 为空')
       return
     }
 
@@ -90,6 +92,8 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
     if (caption) {
       formData.append('description', caption)
     }
+    console.log('FormData created, entries:', Array.from(formData.entries()))
+    console.log('FormData has file?', formData.has('file'))
 
     uploadImage.mutate(
       {
@@ -133,8 +137,17 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
     onRemove: () => {
       setFileList([])
     },
-    beforeUpload: (file: UploadFile) => {
-      setFileList([file])
+    beforeUpload: (file: File) => {
+      console.log('beforeUpload called with file:', file)
+      // Create UploadFile object with proper structure
+      const uploadFile: UploadFile = {
+        uid: `${Date.now()}`,
+        name: file.name,
+        status: 'done',
+        url: URL.createObjectURL(file),
+      }
+      console.log('Setting fileList to:', [uploadFile])
+      setFileList([uploadFile])
       return false
     },
     fileList,

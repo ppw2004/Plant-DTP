@@ -14,16 +14,34 @@ class PlantService:
     def get_plants(self, room_id: Optional[int] = None, health_status: Optional[str] = None,
                    search: Optional[str] = None, skip: int = 0, limit: int = 20,
                    is_active: bool = True) -> List[dict]:
-        """获取植物列表"""
-        query = self.db.query(Plant).filter(Plant.is_active == is_active)
+        """获取植物列表（包含主图和房间名称）"""
+        from sqlalchemy.orm import joinedload
+        from app.models.room import Room
+
+        # 使用 JOIN 来获取房间名称，避免 N+1 查询
+        query = self.db.query(
+            Plant, Room.name.label('room_name')
+        ).join(
+            Room, Plant.room_id == Room.id
+        ).filter(Plant.is_active == is_active)
+
         if room_id:
             query = query.filter(Plant.room_id == room_id)
         if health_status:
             query = query.filter(Plant.health_status == health_status)
         if search:
             query = query.filter(Plant.name.ilike(f"%{search}%"))
-        plants = query.order_by(Plant.id).offset(skip).limit(limit).all()
-        return [plant.to_dict() for plant in plants]
+
+        query = query.order_by(Plant.id).offset(skip).limit(limit)
+        results = query.all()
+
+        # 为每个植物对象传递 db session
+        result = []
+        for plant, room_name in results:
+            # 临时绑定 db session 到 plant 对象
+            plant.db = self.db
+            result.append(plant.to_dict(include_images=True, room_name=room_name))
+        return result
 
     def count_plants(self, room_id: Optional[int] = None, health_status: Optional[str] = None,
                      search: Optional[str] = None, is_active: bool = True) -> int:
