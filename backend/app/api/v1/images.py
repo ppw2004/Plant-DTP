@@ -159,14 +159,10 @@ async def upload_plant_image_file(
     # Get image dimensions
     dimensions = get_image_dimensions(file_path)
 
-    # Generate file URL (dynamic based on request)
-    if request:
-        base_url = f"{request.url.scheme}://{request.url.netloc}"
-        file_url = f"{base_url}/uploads/plants/{filename}"
-        thumbnail_url = f"{base_url}/uploads/plants/thumbnails/{thumbnail_filename}"
-    else:
-        file_url = f"http://localhost:12801/uploads/plants/{filename}"
-        thumbnail_url = f"http://localhost:12801/uploads/plants/thumbnails/{thumbnail_filename}"
+    # Generate file URL (use relative path for production)
+    # 浏览器会自动使用当前域名，通过 Nginx 代理到后端
+    file_url = f"/uploads/plants/{filename}"
+    thumbnail_url = f"/uploads/plants/thumbnails/{thumbnail_filename}"
 
     # Parse capture date if provided
     parsed_capture_date = None

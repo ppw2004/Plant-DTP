@@ -23,17 +23,11 @@ class PlantImage(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     def to_dict(self):
-        # Helper function to fix localhost URLs
-        def fix_url(url):
-            if url and isinstance(url, str) and 'localhost:12801/uploads' in url:
-                return url.replace('http://localhost:12801/uploads', '/uploads')
-            return url
-
         return {
             "id": self.id,
             "plantId": self.plant_id,
-            "url": fix_url(self.url),
-            "thumbnailUrl": fix_url(self.thumbnail_url),
+            "url": self.url,
+            "thumbnailUrl": self.thumbnail_url,
             "caption": self.caption,
             "isPrimary": self.is_primary,
             "fileSize": self.file_size,
