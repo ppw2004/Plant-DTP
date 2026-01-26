@@ -150,8 +150,9 @@ async def upload_plant_image_file(
     with open(file_path, "wb") as f:
         f.write(content)
 
-    # Generate thumbnail
-    thumbnail_filename = f"thumb_{filename}.jpg"
+    # Generate thumbnail (remove original extension to avoid double .jpg.jpg)
+    filename_without_ext = filename.rsplit('.', 1)[0]  # Remove original extension
+    thumbnail_filename = f"thumb_{filename_without_ext}.jpg"
     thumbnail_path = THUMBNAIL_DIR / thumbnail_filename
     create_thumbnail_from_bytes(content, thumbnail_path, size=(300, 300), quality=85)
 
