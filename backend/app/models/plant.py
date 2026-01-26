@@ -49,10 +49,18 @@ class Plant(Base):
 
         # 添加主图信息
         if include_images:
+            # 先查找标记为主图的图片
             primary_image = self.db.query(PlantImage).filter(
                 PlantImage.plant_id == self.id,
                 PlantImage.is_primary == True
             ).first()
+
+            # 如果没有主图，使用第一张图片（按创建时间排序）
+            if not primary_image:
+                primary_image = self.db.query(PlantImage).filter(
+                    PlantImage.plant_id == self.id
+                ).order_by(PlantImage.created_at).first()
+
             if primary_image:
                 data["primaryImage"] = primary_image.to_dict()
             else:
