@@ -18,6 +18,9 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [uploading, setUploading] = useState(false)
 
+  // 检测是否为移动设备
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
   const { data: images, isLoading } = usePlantImages(plantId)
   const addImage = useAddImage()
   const uploadImage = useUploadImage()
@@ -79,10 +82,10 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
       return
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024
+    // Validate file size (max 15MB to account for mobile photos)
+    const maxSize = 15 * 1024 * 1024
     if (file.size > maxSize) {
-      message.error('图片大小不能超过 10MB')
+      message.error('图片大小不能超过 15MB')
       return
     }
 
@@ -94,6 +97,9 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
     }
     console.log('FormData created, entries:', Array.from(formData.entries()))
     console.log('FormData has file?', formData.has('file'))
+    console.log('File size:', file.size, 'bytes (', (file.size / 1024 / 1024).toFixed(2), 'MB)')
+    console.log('File type:', file.type)
+    console.log('User agent:', navigator.userAgent)
 
     uploadImage.mutate(
       {
@@ -107,8 +113,19 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
           setUploading(false)
           setActiveTab('list')
         },
-        onError: () => {
+        onError: (error: any) => {
+          console.error('Upload failed with error:', error)
+          console.error('Error response:', error?.response)
+          console.error('Error status:', error?.response?.status)
+          console.error('Error data:', error?.response?.data)
           setUploading(false)
+
+          // Show specific error message
+          if (error?.response?.status === 413) {
+            message.error('文件太大，请选择小于15MB的图片')
+          } else if (error?.response?.status === 0 || error?.code === 'ERR_NETWORK') {
+            message.error('网络连接失败，请检查网络或稍后重试')
+          }
         },
       }
     )
@@ -137,22 +154,27 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
     onRemove: () => {
       setFileList([])
     },
-    beforeUpload: (file: File) => {
+    beforeUpload: (file: any) => {
       console.log('beforeUpload called with file:', file)
       // Create UploadFile object with proper structure
       const uploadFile: UploadFile = {
-        uid: `${Date.now()}`,
+        uid: file.uid || `${Date.now()}`,
         name: file.name,
         status: 'done',
         url: URL.createObjectURL(file),
+        originFileObj: file, // Important: keep reference to actual file
       }
       console.log('Setting fileList to:', [uploadFile])
       setFileList([uploadFile])
-      return false
+      return false // Prevent auto upload
     },
     fileList,
     maxCount: 1,
     accept: 'image/*',
+    // 移动端优化：添加capture属性，允许直接拍照
+    ...(isMobile && { capture: 'environment' as any }),
+    // 确保在移动端也能正常选择文件
+    multiple: false,
   }
 
   const tabItems = [
@@ -279,13 +301,28 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
               ),
               children: (
                 <Space direction="vertical" style={{ width: '100%' }}>
-                  <Upload.Dragger {...uploadProps} style={{ marginBottom: 16 }}>
-                    <p className="ant-upload-drag-icon">
-                      <UploadOutlined style={{ fontSize: 48, color: '#1890ff' }} />
-                    </p>
-                    <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
-                    <p className="ant-upload-hint">支持 JPG、PNG、GIF、WebP 格式，最大 10MB</p>
-                  </Upload.Dragger>
+                  {isMobile ? (
+                    // 移动端：使用普通Upload按钮
+                    <Upload {...uploadProps} style={{ width: '100%' }}>
+                      <Button icon={<UploadOutlined />} block size="large">
+                        点击选择图片{isMobile && '或拍照'}
+                      </Button>
+                    </Upload>
+                  ) : (
+                    // 桌面端：使用拖拽上传
+                    <Upload.Dragger {...uploadProps} style={{ marginBottom: 16 }}>
+                      <p className="ant-upload-drag-icon">
+                        <UploadOutlined style={{ fontSize: 48, color: '#1890ff' }} />
+                      </p>
+                      <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+                      <p className="ant-upload-hint">支持 JPG、PNG、GIF、WebP 格式，最大 15MB</p>
+                    </Upload.Dragger>
+                  )}
+                  {fileList.length > 0 && (
+                    <div style={{ textAlign: 'center', color: '#52c41a', fontSize: '12px' }}>
+                      已选择: {fileList[0].name} ({((fileList[0].originFileObj?.size || 0) / 1024 / 1024).toFixed(2)} MB)
+                    </div>
+                  )}
                   <Input.TextArea
                     rows={2}
                     placeholder="图片描述（可选）"
@@ -299,6 +336,7 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
                     loading={uploading || uploadImage.isPending}
                     disabled={fileList.length === 0}
                     block
+                    size={isMobile ? 'large' : 'middle'}
                   >
                     上传图片
                   </Button>

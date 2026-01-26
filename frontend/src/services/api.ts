@@ -69,9 +69,39 @@ api.interceptors.request.use(
   }
 )
 
+// Helper function to fix image URLs
+function fixImageUrls(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return obj
+  }
+
+  // If it's a string that looks like a URL with localhost:12801, replace it
+  if (typeof obj === 'string' && obj.includes('localhost:12801/uploads')) {
+    return obj.replace('http://localhost:12801/uploads', '/uploads')
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(fixImageUrls)
+  }
+
+  if (typeof obj === 'object') {
+    const result: any = {}
+    for (const key in obj) {
+      result[key] = fixImageUrls(obj[key])
+    }
+    return result
+  }
+
+  return obj
+}
+
 // Response interceptor
 api.interceptors.response.use(
   (response: AxiosResponse) => {
+    // Fix localhost URLs in response data
+    if (response.data) {
+      response.data = fixImageUrls(response.data)
+    }
     return response
   },
   (error: AxiosError) => {
