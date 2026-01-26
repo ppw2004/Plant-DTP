@@ -171,9 +171,7 @@ const ImageUpload = ({ visible, onClose, plantId }: ImageUploadProps) => {
     fileList,
     maxCount: 1,
     accept: 'image/*',
-    // 移动端优化：添加capture属性，允许直接拍照
-    ...(isMobile && { capture: 'environment' as any }),
-    // 确保在移动端也能正常选择文件
+    // 移动端：不设置capture属性，允许用户选择从相册上传或拍照
     multiple: false,
   }
 
