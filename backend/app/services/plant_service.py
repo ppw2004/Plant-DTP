@@ -32,7 +32,8 @@ class PlantService:
         if search:
             query = query.filter(Plant.name.ilike(f"%{search}%"))
 
-        query = query.order_by(Plant.id).offset(skip).limit(limit)
+        # 按最后修改顺序排序（使用ID倒序，ID越大表示越新）
+        query = query.order_by(Plant.id.desc()).offset(skip).limit(limit)
         results = query.all()
 
         # 为每个植物对象传递 db session
