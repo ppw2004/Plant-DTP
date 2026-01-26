@@ -16,7 +16,9 @@ router = APIRouter()
 
 # Upload directory configuration
 UPLOAD_DIR = Path("uploads/plants")
+THUMBNAIL_DIR = Path("uploads/plants/thumbnails")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
 
 # File size limit (10MB)
 MAX_FILE_SIZE = 10 * 1024 * 1024
@@ -113,6 +115,7 @@ async def upload_plant_image_file(
     import logging
     logger = logging.getLogger(__name__)
     from datetime import datetime
+    from app.utils.image_utils import create_thumbnail_from_bytes, get_image_dimensions
 
     # Debug logging
     logger.info(f"Upload request received:")
@@ -143,18 +146,26 @@ async def upload_plant_image_file(
     filename = generate_unique_filename(file.filename or "image.jpg")
     file_path = UPLOAD_DIR / filename
 
-    # Save file
+    # Save original file
     with open(file_path, "wb") as f:
         f.write(content)
 
+    # Generate thumbnail
+    thumbnail_filename = f"thumb_{filename}.jpg"
+    thumbnail_path = THUMBNAIL_DIR / thumbnail_filename
+    create_thumbnail_from_bytes(content, thumbnail_path, size=(300, 300), quality=85)
+
+    # Get image dimensions
+    dimensions = get_image_dimensions(file_path)
+
     # Generate file URL (dynamic based on request)
     if request:
-        # Get base URL from request (scheme + host + port)
         base_url = f"{request.url.scheme}://{request.url.netloc}"
         file_url = f"{base_url}/uploads/plants/{filename}"
+        thumbnail_url = f"{base_url}/uploads/plants/thumbnails/{thumbnail_filename}"
     else:
-        # Fallback to localhost (shouldn't happen in normal operation)
         file_url = f"http://localhost:12801/uploads/plants/{filename}"
+        thumbnail_url = f"http://localhost:12801/uploads/plants/thumbnails/{thumbnail_filename}"
 
     # Parse capture date if provided
     parsed_capture_date = None
@@ -169,9 +180,13 @@ async def upload_plant_image_file(
     try:
         image_data = PlantImageCreate(
             url=file_url,
+            thumbnail_url=thumbnail_url,
             caption=description,
             is_primary=is_primary,
-            taken_at=parsed_capture_date
+            taken_at=parsed_capture_date,
+            file_size=len(content),
+            width=dimensions[0] if dimensions else None,
+            height=dimensions[1] if dimensions else None
         )
         new_image = service.create_image(plant_id, image_data)
         return {
@@ -179,9 +194,11 @@ async def upload_plant_image_file(
             "data": new_image
         }
     except Exception as e:
-        # Delete file if database operation fails
+        # Delete files if database operation fails
         if file_path.exists():
             file_path.unlink()
+        if thumbnail_path.exists():
+            thumbnail_path.unlink()
         raise HTTPException(status_code=400, detail=str(e))
 
 

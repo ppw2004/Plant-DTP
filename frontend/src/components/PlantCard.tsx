@@ -34,6 +34,10 @@ const PlantCard = ({ plant, onEdit, onDelete, onManageCare, onManageImages }: Pl
   const imageCount = plant.imageCount || 0
   const hasImages = imageCount > 0
 
+  // 优先使用缩略图，如果没有缩略图则使用原图
+  const displayImageUrl = plant.primaryImage?.thumbnailUrl || plant.primaryImage?.url
+  const fullImageUrl = plant.primaryImage?.url
+
   const defaultImage = (
     <div
       style={{
@@ -55,12 +59,14 @@ const PlantCard = ({ plant, onEdit, onDelete, onManageCare, onManageImages }: Pl
     <Card
       hoverable
       cover={
-        plant.primaryImage ? (
+        displayImageUrl ? (
           <Image
-            src={plant.primaryImage.url}
+            src={displayImageUrl}
             alt={plant.name}
             style={{ height: '140px', objectFit: 'contain' }}
-            preview={true}
+            preview={{
+              src: fullImageUrl, // 预览时使用原图
+            }}
             fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Crect width='140' height='140' fill='%23f5f5f5'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='32'%3E🌱%3C/text%3E%3C/svg%3E"
           />
         ) : (
