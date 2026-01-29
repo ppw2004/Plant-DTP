@@ -18,6 +18,7 @@ import MobileLayout from './layouts/MobileLayout'
 // ==================== 移动端页面 ====================
 import MobileDashboard from './pages/mobile/MobileDashboard'
 import MobilePlants from './pages/mobile/MobilePlants'
+import MobilePlantDetail from './pages/mobile/MobilePlantDetail'
 import MobileRooms from './pages/mobile/MobileRooms'
 import MobileTasks from './pages/mobile/MobileTasks'
 
@@ -38,6 +39,7 @@ function App() {
       <Route path="/mobile" element={<MobileLayout />}>
         <Route index element={<MobileDashboard />} />
         <Route path="plants" element={<MobilePlants />} />
+        <Route path="plants/:id" element={<MobilePlantDetail />} />
         <Route path="rooms" element={<MobileRooms />} />
         <Route path="tasks" element={<MobileTasks />} />
       </Route>
