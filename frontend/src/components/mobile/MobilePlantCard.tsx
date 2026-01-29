@@ -1,17 +1,6 @@
 import { Card, Image, Tag } from 'antd-mobile'
 import { useNavigate } from 'react-router-dom'
-
-interface Plant {
-  id: number
-  name: string
-  location?: string
-  primary_image?: {
-    thumbnail_url: string
-  }
-  needs_watering?: boolean
-  needs_fertilizing?: boolean
-  images?: Array<{ thumbnail_url: string }>
-}
+import type { Plant } from '../../types/api'
 
 interface MobilePlantCardProps {
   plant: Plant
@@ -29,7 +18,7 @@ interface MobilePlantCardProps {
 export default function MobilePlantCard({ plant }: MobilePlantCardProps) {
   const navigate = useNavigate()
 
-  const imageUrl = plant.primary_image?.thumbnail_url || plant.images?.[0]?.thumbnail_url || ''
+  const imageUrl = plant.primaryImage?.thumbnailUrl || ''
 
   return (
     <Card
@@ -88,7 +77,7 @@ export default function MobilePlantCard({ plant }: MobilePlantCardProps) {
         </div>
 
         {/* 位置 */}
-        {plant.location && (
+        {plant.roomName && (
           <div style={{
             fontSize: 12,
             color: '#999',
@@ -97,23 +86,30 @@ export default function MobilePlantCard({ plant }: MobilePlantCardProps) {
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}>
-            📍 {plant.location}
+            📍 {plant.roomName}
           </div>
         )}
 
-        {/* 标签 */}
-        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-          {plant.needs_watering && (
-            <Tag color="primary" style={{ fontSize: 10 }}>
-              需浇水
-            </Tag>
-          )}
-          {plant.needs_fertilizing && (
-            <Tag color="success" style={{ fontSize: 10 }}>
-              需施肥
-            </Tag>
-          )}
-        </div>
+        {/* 健康状态标签 */}
+        {plant.healthStatus && (
+          <div style={{ display: 'flex', gap: 4 }}>
+            {plant.healthStatus === 'healthy' && (
+              <Tag color="success" style={{ fontSize: 10 }}>
+                健康
+              </Tag>
+            )}
+            {plant.healthStatus === 'needs_attention' && (
+              <Tag color="warning" style={{ fontSize: 10 }}>
+                需要关注
+              </Tag>
+            )}
+            {plant.healthStatus === 'critical' && (
+              <Tag color="danger" style={{ fontSize: 10 }}>
+                紧急
+              </Tag>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   )
