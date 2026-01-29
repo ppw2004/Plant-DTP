@@ -18,7 +18,8 @@ interface MobilePlantCardProps {
 export default function MobilePlantCard({ plant }: MobilePlantCardProps) {
   const navigate = useNavigate()
 
-  const imageUrl = plant.primaryImage?.thumbnailUrl || ''
+  // 优先使用缩略图，如果不存在则使用原图，最后为空字符串
+  const imageUrl = plant.primaryImage?.thumbnailUrl || plant.primaryImage?.url || ''
 
   return (
     <Card
