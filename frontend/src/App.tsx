@@ -20,6 +20,7 @@ import MobileDashboard from './pages/mobile/MobileDashboard'
 import MobilePlants from './pages/mobile/MobilePlants'
 import MobilePlantDetail from './pages/mobile/MobilePlantDetail'
 import MobileRooms from './pages/mobile/MobileRooms'
+import MobileRoomDetail from './pages/mobile/MobileRoomDetail'
 import MobileTasks from './pages/mobile/MobileTasks'
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
         <Route path="plants" element={<MobilePlants />} />
         <Route path="plants/:id" element={<MobilePlantDetail />} />
         <Route path="rooms" element={<MobileRooms />} />
+        <Route path="rooms/:id" element={<MobileRoomDetail />} />
         <Route path="tasks" element={<MobileTasks />} />
       </Route>
 
