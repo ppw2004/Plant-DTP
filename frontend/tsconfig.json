@@ -21,5 +21,6 @@
     }
   },
   "include": ["src"],
+  "exclude": ["src/pages/desktop", "src/**/*.example.tsx", "src/**/*.bak"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

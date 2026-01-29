@@ -1,4 +1,4 @@
-import { Card, Grid, Typography } from 'antd-mobile'
+import { Card, Grid } from 'antd-mobile'
 import {
   EnvironmentOutline,
   UnorderedListOutline,
@@ -19,7 +19,7 @@ import { useTaskList } from '../../hooks/useTasks'
  */
 export default function MobileDashboard() {
   const navigate = useNavigate()
-  const { data: stats, isLoading } = useDashboardStats()
+  const { data: stats } = useDashboardStats()
   const { data: taskList } = useTaskList()
 
   const todayTasks = taskList?.todayTasks?.slice(0, 5) || []
@@ -27,9 +27,9 @@ export default function MobileDashboard() {
   return (
     <div style={{ padding: 16, paddingBottom: 66 }}>
       {/* 欢迎信息 */}
-      <Typography.Title level={5} style={{ marginBottom: 16 }}>
+      <h3 style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 16, margin: 0 }}>
         👋 欢迎回来！
-      </Typography.Title>
+      </h3>
 
       {/* 统计卡片 */}
       <Grid columns={2} gap={16}>
@@ -107,9 +107,9 @@ export default function MobileDashboard() {
                 cursor: 'pointer'
               }}
             >
-              <div style={{ fontWeight: 500 }}>{task.title}</div>
+              <div style={{ fontWeight: 500 }}>{task.taskType}</div>
               <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
-                {task.plant?.name} • {task.task_type}
+                {task.plant?.name || task.plantName}
               </div>
             </div>
           ))}

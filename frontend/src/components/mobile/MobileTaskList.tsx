@@ -1,21 +1,10 @@
 import { List, Empty, SwipeAction, Dialog } from 'antd-mobile'
-import { CheckCircleOutlined, ClockCircleOutlined } from 'antd-mobile-icons'
+import { CheckCircleOutline, ClockCircleOutline } from 'antd-mobile-icons'
 import { useNavigate } from 'react-router-dom'
-
-interface Task {
-  id: number
-  title: string
-  due_date: string
-  is_overdue: boolean
-  task_type: string
-  plant?: {
-    id: number
-    name: string
-  }
-}
+import type { PlantTask } from '../../types/api'
 
 interface MobileTaskListProps {
-  tasks: Task[]
+  tasks: PlantTask[]
   isLoading?: boolean
 }
 
@@ -30,9 +19,9 @@ interface MobileTaskListProps {
 export default function MobileTaskList({ tasks, isLoading }: MobileTaskListProps) {
   const navigate = useNavigate()
 
-  const handleComplete = async (task: Task) => {
+  const handleComplete = async (task: PlantTask) => {
     const result = await Dialog.confirm({
-      content: `确认完成"${task.title}"？`,
+      content: `确认完成"${task.taskType}"？`,
     })
 
     if (result) {
@@ -41,7 +30,7 @@ export default function MobileTaskList({ tasks, isLoading }: MobileTaskListProps
     }
   }
 
-  const handleSnooze = (task: Task) => {
+  const handleSnooze = (task: PlantTask) => {
     // TODO: 实现推迟功能
     console.log('Snooze task:', task.id)
   }
@@ -64,7 +53,7 @@ export default function MobileTaskList({ tasks, isLoading }: MobileTaskListProps
   }
 
   return (
-    <List style={{ '--padding-left': 0, '--padding-right': 0 }}>
+    <List style={{ '--padding-left': '0', '--padding-right': '0' }}>
       {tasks.map(task => (
         <SwipeAction
           key={task.id}
@@ -88,7 +77,7 @@ export default function MobileTaskList({ tasks, isLoading }: MobileTaskListProps
             style={{
               padding: '16px',
               borderBottom: '1px solid #f0f0f0',
-              backgroundColor: task.is_overdue ? '#fff2f0' : '#fff',
+              backgroundColor: new Date(task.dueDate) < new Date() && task.status !== 'completed' ? '#fff2f0' : '#fff',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -100,12 +89,12 @@ export default function MobileTaskList({ tasks, isLoading }: MobileTaskListProps
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: task.is_overdue ? '#ffccc7' : '#e6f7ff',
+                backgroundColor: new Date(task.dueDate) < new Date() && task.status !== 'completed' ? '#ffccc7' : '#e6f7ff',
               }}>
-                {task.is_overdue ? (
-                  <ClockCircleOutlined style={{ color: '#ff4d4f', fontSize: 20 }} />
+                {new Date(task.dueDate) < new Date() && task.status !== 'completed' ? (
+                  <ClockCircleOutline style={{ color: '#ff4d4f', fontSize: 20 }} />
                 ) : (
-                  <CheckCircleOutlined style={{ color: '#1890ff', fontSize: 20 }} />
+                  <CheckCircleOutline style={{ color: '#1890ff', fontSize: 20 }} />
                 )}
               </div>
 
@@ -119,7 +108,7 @@ export default function MobileTaskList({ tasks, isLoading }: MobileTaskListProps
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                 }}>
-                  {task.title}
+                  {task.taskType}
                 </div>
                 <div style={{
                   fontSize: 12,
@@ -130,17 +119,17 @@ export default function MobileTaskList({ tasks, isLoading }: MobileTaskListProps
                 }}>
                   <span>{task.plant?.name || '未关联植物'}</span>
                   <span>•</span>
-                  <span>{task.task_type}</span>
+                  <span>{task.taskType}</span>
                 </div>
               </div>
 
               {/* 到期时间 */}
               <div style={{
                 fontSize: 12,
-                color: task.is_overdue ? '#ff4d4f' : '#999',
+                color: new Date(task.dueDate) < new Date() && task.status !== 'completed' ? '#ff4d4f' : '#999',
                 whiteSpace: 'nowrap',
               }}>
-                {new Date(task.due_date).toLocaleDateString('zh-CN', {
+                {new Date(task.dueDate).toLocaleDateString('zh-CN', {
                   month: '2-digit',
                   day: '2-digit'
                 })}

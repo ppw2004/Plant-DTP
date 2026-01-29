@@ -17,10 +17,11 @@ export default function MobilePlants() {
   const [hasMore, setHasMore] = useState(true)
   const [searchText, setSearchText] = useState('')
 
-  const { plants, isLoading } = usePlants({
+  const { data, isLoading } = usePlants({
     page,
     search: searchText,
   })
+  const plants = data?.items || []
 
   // 加载更多
   const loadMore = async () => {

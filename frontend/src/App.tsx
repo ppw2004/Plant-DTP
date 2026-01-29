@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 // ==================== 布局 ====================
 import Layout from './components/Layout'
@@ -13,13 +13,13 @@ import ArchivedPlants from './pages/ArchivedPlants'
 import Suggestions from './pages/Suggestions'
 
 // ==================== 移动端布局 ====================
-// import MobileLayout from './layouts/MobileLayout'
+import MobileLayout from './layouts/MobileLayout'
 
 // ==================== 移动端页面 ====================
-// import MobileDashboard from './pages/mobile/MobileDashboard'
-// import MobilePlants from './pages/mobile/MobilePlants'
-// import MobileRooms from './pages/mobile/MobileRooms'
-// import MobileTasks from './pages/mobile/MobileTasks'
+import MobileDashboard from './pages/mobile/MobileDashboard'
+import MobilePlants from './pages/mobile/MobilePlants'
+import MobileRooms from './pages/mobile/MobileRooms'
+import MobileTasks from './pages/mobile/MobileTasks'
 
 function App() {
   return (
@@ -35,15 +35,13 @@ function App() {
           <Route path="suggestions" element={<Suggestions />} />
         </Route>
 
-        {/* ==================== 移动端路由（待启用）==================== */}
-        {/*
+        {/* ==================== 移动端路由 ==================== */}
         <Route path="/mobile" element={<MobileLayout />}>
           <Route index element={<MobileDashboard />} />
           <Route path="plants" element={<MobilePlants />} />
           <Route path="rooms" element={<MobileRooms />} />
           <Route path="tasks" element={<MobileTasks />} />
         </Route>
-        */}
 
         {/* ==================== 404页面 ==================== */}
         <Route

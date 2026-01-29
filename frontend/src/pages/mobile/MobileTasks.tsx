@@ -11,7 +11,7 @@ import MobileTaskList from '../../components/mobile/MobileTaskList'
  * - 滑动操作（完成/推迟）
  */
 export default function MobileTasks() {
-  const { taskList, isLoading } = useTaskList()
+  const { data: taskList, isLoading } = useTaskList()
 
   const todayTasks = taskList?.todayTasks || []
   const upcomingTasks = taskList?.upcomingTasks || []

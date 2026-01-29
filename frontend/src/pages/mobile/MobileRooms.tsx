@@ -1,4 +1,4 @@
-import { Card, Grid, Typography, Tag } from 'antd-mobile'
+import { Card, Grid, Tag } from 'antd-mobile'
 import { FolderOutline } from 'antd-mobile-icons'
 import { useNavigate } from 'react-router-dom'
 import { useRooms } from '../../hooks/useRooms'
@@ -13,13 +13,14 @@ import { useRooms } from '../../hooks/useRooms'
  */
 export default function MobileRooms() {
   const navigate = useNavigate()
-  const { rooms, isLoading } = useRooms()
+  const { data } = useRooms()
+  const rooms = data?.items || []
 
   return (
     <div style={{ padding: 16, paddingBottom: 66 }}>
-      <Typography.Title level={5} style={{ marginBottom: 16 }}>
+      <h3 style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 16, margin: 0 }}>
         房间列表
-      </Typography.Title>
+      </h3>
 
       {/* 房间网格 */}
       {rooms && rooms.length > 0 ? (
@@ -43,7 +44,7 @@ export default function MobileRooms() {
                     {room.name}
                   </div>
                   <Tag color="primary" style={{ marginTop: 8 }}>
-                    {room.plant_count || 0} 株植物
+                    {room.plantCount || 0} 株植物
                   </Tag>
                 </div>
               </Card>
