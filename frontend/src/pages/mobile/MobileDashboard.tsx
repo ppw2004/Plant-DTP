@@ -39,7 +39,7 @@ export default function MobileDashboard() {
             style={{ cursor: 'pointer' }}
           >
             <div style={{ textAlign: 'center' }}>
-              <EnvironmentOutline fontSize={32} color="#1890ff" />
+              <EnvironmentOutline style={{ fontSize: 32, color: '#1890ff' }} />
               <div style={{ fontSize: 24, fontWeight: 'bold', marginTop: 8 }}>
                 {stats?.totalRooms || 0}
               </div>
@@ -54,7 +54,7 @@ export default function MobileDashboard() {
             style={{ cursor: 'pointer' }}
           >
             <div style={{ textAlign: 'center' }}>
-              <UnorderedListOutline fontSize={32} color="#52c41a" />
+              <UnorderedListOutline style={{ fontSize: 32, color: '#52c41a' }} />
               <div style={{ fontSize: 24, fontWeight: 'bold', marginTop: 8 }}>
                 {stats?.totalPlants || 0}
               </div>
@@ -69,7 +69,7 @@ export default function MobileDashboard() {
             style={{ cursor: 'pointer' }}
           >
             <div style={{ textAlign: 'center' }}>
-              <ClockCircleOutline fontSize={32} color="#faad14" />
+              <ClockCircleOutline style={{ fontSize: 32, color: '#faad14' }} />
               <div style={{ fontSize: 24, fontWeight: 'bold', marginTop: 8 }}>
                 {taskList?.todayTasks?.length || 0}
               </div>
@@ -84,7 +84,7 @@ export default function MobileDashboard() {
             style={{ cursor: 'pointer' }}
           >
             <div style={{ textAlign: 'center' }}>
-              <CheckCircleOutline fontSize={32} color="#ff4d4f" />
+              <CheckCircleOutline style={{ fontSize: 32, color: '#ff4d4f' }} />
               <div style={{ fontSize: 24, fontWeight: 'bold', marginTop: 8 }}>
                 {taskList?.overdueTasks?.length || 0}
               </div>
@@ -96,7 +96,8 @@ export default function MobileDashboard() {
 
       {/* 今日任务 */}
       {todayTasks.length > 0 && (
-        <Card title="今日任务" style={{ marginTop: 16 }}>
+        <Card style={{ marginTop: 16 }}>
+          <div style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>今日任务</div>
           {todayTasks.map(task => (
             <div
               key={task.id}
