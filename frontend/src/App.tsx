@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 // ==================== 布局 ====================
 import Layout from './components/Layout'
@@ -23,46 +23,44 @@ import MobileTasks from './pages/mobile/MobileTasks'
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* ==================== 桌面版路由 ==================== */}
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="rooms" element={<Rooms />} />
-          <Route path="plants" element={<Plants />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="archive" element={<ArchivedPlants />} />
-          <Route path="suggestions" element={<Suggestions />} />
-        </Route>
+    <Routes>
+      {/* ==================== 桌面版路由 ==================== */}
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="rooms" element={<Rooms />} />
+        <Route path="plants" element={<Plants />} />
+        <Route path="tasks" element={<Tasks />} />
+        <Route path="archive" element={<ArchivedPlants />} />
+        <Route path="suggestions" element={<Suggestions />} />
+      </Route>
 
-        {/* ==================== 移动端路由 ==================== */}
-        <Route path="/mobile" element={<MobileLayout />}>
-          <Route index element={<MobileDashboard />} />
-          <Route path="plants" element={<MobilePlants />} />
-          <Route path="rooms" element={<MobileRooms />} />
-          <Route path="tasks" element={<MobileTasks />} />
-        </Route>
+      {/* ==================== 移动端路由 ==================== */}
+      <Route path="/mobile" element={<MobileLayout />}>
+        <Route index element={<MobileDashboard />} />
+        <Route path="plants" element={<MobilePlants />} />
+        <Route path="rooms" element={<MobileRooms />} />
+        <Route path="tasks" element={<MobileTasks />} />
+      </Route>
 
-        {/* ==================== 404页面 ==================== */}
-        <Route
-          path="*"
-          element={
-            <div style={{
-              height: '100vh',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column',
-              gap: 16
-            }}>
-              <h1 style={{ fontSize: 72, margin: 0 }}>🌱</h1>
-              <h2>404 - 页面未找到</h2>
-              <a href="/">返回首页</a>
-            </div>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+      {/* ==================== 404页面 ==================== */}
+      <Route
+        path="*"
+        element={
+          <div style={{
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            gap: 16
+          }}>
+            <h1 style={{ fontSize: 72, margin: 0 }}>🌱</h1>
+            <h2>404 - 页面未找到</h2>
+            <a href="/">返回首页</a>
+          </div>
+        }
+      />
+    </Routes>
   )
 }
 
