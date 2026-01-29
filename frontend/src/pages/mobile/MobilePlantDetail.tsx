@@ -1,9 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { Card, Button, Grid, Toast } from 'antd-mobile'
-import { LeftOutline, CameraOutline, CalendarOutline } from 'antd-mobile-icons'
+import { LeftOutline, CameraOutline } from 'antd-mobile-icons'
 import { usePlant } from '../../hooks/usePlants'
 import { usePlantImages } from '../../hooks/useImages'
-import { usePlantTasks } from '../../hooks/useTasks'
 
 /**
  * 移动端植物详情页
@@ -15,7 +14,6 @@ export default function MobilePlantDetail() {
 
   const { data: plant, isLoading } = usePlant(plantId)
   const { data: images } = usePlantImages(plantId)
-  const { data: tasks } = usePlantTasks(plantId)
 
   if (isLoading) {
     return (
@@ -101,30 +99,6 @@ export default function MobilePlantDetail() {
           <div style={{ fontSize: 14, color: '#666', lineHeight: 1.6 }}>
             {plant.description}
           </div>
-        </Card>
-      )}
-
-      {/* 最近任务 */}
-      {tasks && tasks.length > 0 && (
-        <Card style={{ margin: '0 16px 16px' }}>
-          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>
-            <CalendarOutline style={{ marginRight: 8 }} />
-            最近任务
-          </div>
-          {tasks.slice(0, 5).map(task => (
-            <div
-              key={task.id}
-              style={{
-                padding: '12px 0',
-                borderBottom: '1px solid #f0f0f0',
-              }}
-            >
-              <div style={{ fontSize: 15, marginBottom: 4 }}>{task.taskType}</div>
-              <div style={{ fontSize: 12, color: '#999' }}>
-                {new Date(task.dueDate).toLocaleDateString('zh-CN')}
-              </div>
-            </div>
-          ))}
         </Card>
       )}
 
