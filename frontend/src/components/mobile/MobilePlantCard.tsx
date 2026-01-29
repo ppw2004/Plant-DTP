@@ -21,6 +21,16 @@ export default function MobilePlantCard({ plant }: MobilePlantCardProps) {
   // 优先使用缩略图，如果不存在则使用原图，最后为空字符串
   const imageUrl = plant.primaryImage?.thumbnailUrl || plant.primaryImage?.url || ''
 
+  // 调试：输出图片信息
+  console.log('Plant card image:', {
+    plantId: plant.id,
+    plantName: plant.name,
+    hasPrimaryImage: !!plant.primaryImage,
+    thumbnailUrl: plant.primaryImage?.thumbnailUrl,
+    originalUrl: plant.primaryImage?.url,
+    finalImageUrl: imageUrl
+  })
+
   return (
     <Card
       onClick={() => navigate(`/mobile/plants/${plant.id}`)}

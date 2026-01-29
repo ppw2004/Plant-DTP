@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { AutoCenter, InfiniteScroll, SearchBar, DotLoading } from 'antd-mobile'
+import { useState } from 'react'
+import { SearchBar, DotLoading } from 'antd-mobile'
 import { usePlants } from '../../hooks/usePlants'
 import MobilePlantCard from '../../components/mobile/MobilePlantCard'
 
@@ -13,34 +13,13 @@ import MobilePlantCard from '../../components/mobile/MobilePlantCard'
  * - 空状态提示
  */
 export default function MobilePlants() {
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
   const [searchText, setSearchText] = useState('')
 
   const { data, isLoading } = usePlants({
-    page,
+    page: 1,
     search: searchText,
   })
   const plants = data?.items || []
-
-  // 加载更多
-  const loadMore = async () => {
-    if (!hasMore || isLoading) return
-
-    const newPage = page + 1
-    setPage(newPage)
-
-    // 检查是否还有更多数据（假设总共100条）
-    if (plants.length >= 100) {
-      setHasMore(false)
-    }
-  }
-
-  // 搜索时重置
-  useEffect(() => {
-    setPage(1)
-    setHasMore(true)
-  }, [searchText])
 
   return (
     <div style={{ paddingBottom: 66 }}>
@@ -59,7 +38,7 @@ export default function MobilePlants() {
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
           gap: 12,
-          padding: '0 16px',
+          padding: '0 16px 16px',
         }}>
           {plants.map(plant => (
             <MobilePlantCard key={plant.id} plant={plant} />
@@ -67,31 +46,21 @@ export default function MobilePlants() {
         </div>
       )}
 
-      {/* 加载更多 */}
-      {plants.length > 0 && (
-        <InfiniteScroll loadMore={loadMore} hasMore={hasMore}>
-          {hasMore ? (
-            <div style={{ textAlign: 'center', padding: 16 }}>
-              <DotLoading />
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', padding: 16, color: '#999' }}>
-              没有更多了
-            </div>
-          )}
-        </InfiniteScroll>
+      {/* 加载状态 */}
+      {isLoading && (
+        <div style={{ textAlign: 'center', padding: 16 }}>
+          <DotLoading />
+        </div>
       )}
 
       {/* 空状态 */}
       {plants.length === 0 && !isLoading && (
-        <AutoCenter>
-          <div style={{ textAlign: 'center', marginTop: 100, color: '#999' }}>
-            <div style={{ fontSize: 48 }}>🌱</div>
-            <div style={{ marginTop: 16 }}>
-              {searchText ? '没有找到相关植物' : '还没有植物，快去添加吧！'}
-            </div>
+        <div style={{ textAlign: 'center', marginTop: 100, color: '#999' }}>
+          <div style={{ fontSize: 48 }}>🌱</div>
+          <div style={{ marginTop: 16 }}>
+            {searchText ? '没有找到相关植物' : '还没有植物，快去添加吧！'}
           </div>
-        </AutoCenter>
+        </div>
       )}
     </div>
   )
