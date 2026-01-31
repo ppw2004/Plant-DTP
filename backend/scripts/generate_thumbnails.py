@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.core.database import SessionLocal
 from app.models.plant_image import PlantImage
+from app.models.plant import Plant  # 确保导入Plant模型以建立外键关系
 from app.utils.image_utils import create_thumbnail
 import urllib.request
 
@@ -18,10 +19,10 @@ def generate_thumbnails_for_existing_images():
     """为所有没有缩略图的图片生成缩略图"""
     db = SessionLocal()
     try:
-        # 查询所有没有缩略图的图片
+        # 查询所有没有缩略图的图片（匹配相对路径和完整URL）
         images = db.query(PlantImage).filter(
             PlantImage.thumbnail_url == None,
-            PlantImage.url.like('/uploads/plants/%')
+            PlantImage.url.like('%uploads/plants/%')
         ).all()
 
         print(f"找到 {len(images)} 张需要生成缩略图的图片")
