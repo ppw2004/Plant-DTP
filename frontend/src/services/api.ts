@@ -49,6 +49,8 @@ api.interceptors.request.use(
       console.log('FormData entries:', Array.from((config.data as FormData).entries()))
       // Remove Content-Type to let browser set it automatically with correct boundary
       delete config.headers['Content-Type']
+      // Increase timeout for file uploads (5 minutes)
+      config.timeout = 300000
       return config
     }
 

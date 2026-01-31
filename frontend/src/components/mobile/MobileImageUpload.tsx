@@ -117,6 +117,7 @@ export default function MobileImageUpload({ visible, onClose, plantId }: MobileI
       { plantId, formData },
       {
         onSuccess: () => {
+          console.log('✓ Upload mutation success')
           Toast.show({ content: '上传成功', icon: 'success' })
           setSelectedFile(null)
           setPreviewUrl('')
@@ -125,10 +126,7 @@ export default function MobileImageUpload({ visible, onClose, plantId }: MobileI
           setActiveTab('list')
         },
         onError: (error: any) => {
-          console.error('Upload failed:', error)
-          console.error('Error response:', error?.response?.data)
-          console.error('Error status:', error?.response?.status)
-          console.error('Full error:', JSON.stringify(error?.response?.data, null, 2))
+          console.error('✗ Upload mutation error:', error)
           setUploading(false)
 
           // 显示具体错误信息
@@ -150,6 +148,11 @@ export default function MobileImageUpload({ visible, onClose, plantId }: MobileI
           }
 
           Toast.show({ content: errorMessage })
+        },
+        onSettled: () => {
+          console.log('✓ Upload mutation settled')
+          // 确保 loading 状态被重置
+          setUploading(false)
         }
       }
     )
