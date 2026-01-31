@@ -264,6 +264,10 @@ $RECYCLE.BIN/
 backend/uploads/
 uploads/
 
+# Test images
+image/
+images/
+
 # Backup files
 *.backup
 *.bak
