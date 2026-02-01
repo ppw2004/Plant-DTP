@@ -45,6 +45,19 @@ class Settings(BaseSettings):
     # API配置
     API_V1_PREFIX: str = "/api/v1"
 
+    # 百度AI配置
+    BAIDU_AI_APP_ID: str = ""
+    BAIDU_AI_API_KEY: str = ""
+    BAIDU_AI_SECRET_KEY: str = ""
+    BAIDU_AI_PLANT_URL: str = "https://aip.baidubce.com/rest/2.0/image-classify/v1/plant"
+
+    # 植物识别配置
+    IDENTIFICATION_CACHE_TTL: int = 86400  # 24小时
+    MAX_IDENTIFICATION_IMAGE_SIZE: int = 4194304  # 4MB
+    IDENTIFICATION_TEMP_DIR: str = "uploads/identifications"
+    BAIDU_AI_QPS: int = 2  # 每秒并发请求数
+    BAIDU_AI_TIMEOUT: int = 10  # 请求超时时间（秒）
+
     # 时区
     TIMEZONE: str = "Asia/Shanghai"
 

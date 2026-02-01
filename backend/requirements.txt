@@ -29,6 +29,9 @@ orjson==3.9.12
 # 图片处理
 Pillow==10.2.0
 
+# AI服务
+baidu-aip==4.16.13
+
 # 日期处理
 python-dateutil==2.8.2
 

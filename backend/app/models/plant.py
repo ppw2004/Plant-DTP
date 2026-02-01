@@ -1,8 +1,9 @@
 """
 植物模型
 """
-from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from app.core.database import Base
 
 
@@ -18,7 +19,11 @@ class Plant(Base):
     description = Column(Text, nullable=True)
     purchase_date = Column(Date, nullable=True)
     health_status = Column(String(20), default="healthy")
+    identification_id = Column(Integer, ForeignKey("plant_identifications.id"), nullable=True)
+    source = Column(String(20), default="manual", nullable=False)  # manual | identify
     is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     def to_dict(self, include_images=False, room_name=None):
         """
@@ -40,7 +45,11 @@ class Plant(Base):
             "description": self.description,
             "purchaseDate": self.purchase_date.isoformat() if self.purchase_date else None,
             "healthStatus": self.health_status,
-            "isActive": self.is_active
+            "identificationId": self.identification_id,
+            "source": self.source,
+            "isActive": self.is_active,
+            "createdAt": self.created_at.isoformat() if self.created_at else None,
+            "updatedAt": self.updated_at.isoformat() if self.updated_at else None
         }
 
         # 添加房间名称
@@ -72,3 +81,26 @@ class Plant(Base):
             ).count()
 
         return data
+
+    def get_primary_image_url(self):
+        """获取主图URL"""
+        from app.models.plant_image import PlantImage
+        from app.core.database import get_db
+
+        db = next(get_db())
+        try:
+            # 先查找标记为主图的图片
+            primary_image = db.query(PlantImage).filter(
+                PlantImage.plant_id == self.id,
+                PlantImage.is_primary == True
+            ).first()
+
+            # 如果没有主图，使用第一张图片
+            if not primary_image:
+                primary_image = db.query(PlantImage).filter(
+                    PlantImage.plant_id == self.id
+                ).order_by(PlantImage.created_at).first()
+
+            return primary_image.url if primary_image else None
+        finally:
+            db.close()

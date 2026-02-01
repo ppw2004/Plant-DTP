@@ -309,3 +309,25 @@ README.md
 LICENSE
 *.log
 nohup.out
+
+# ====================
+# Temporary Scripts & Files
+# ====================
+
+# AI coding agent instructions
+.coding-agent-instructions.md
+
+# Temporary migration/fix scripts in backend
+backend/fix_*.py
+backend/check_*.py
+backend/migrate_*.py
+backend/normalize_*.py
+backend/rename_*.py
+
+# Temporary hash-named image files
+# 32-character hex hash files (like MD5)
+[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9].*
+
+# Alternative pattern for any hex-named files
+**/[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].*
+

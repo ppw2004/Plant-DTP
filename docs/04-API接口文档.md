@@ -823,9 +823,264 @@ isPrimary: true
 
 ---
 
-## 7. 任务类型模块
+## 7. 植物识别模块
 
-### 7.1 获取任务类型列表
+### 7.1 植物识别
+
+**接口**: `POST /plants/identify`
+
+**请求类型**: `multipart/form-data`
+
+**请求参数**:
+```
+file: <binary> (必填，图片文件)
+includeDetails: true (可选，是否返回百科信息，默认true)
+```
+
+**请求限制**:
+- 图片格式：JPG、PNG、BMP
+- 图片大小：不超过4MB
+- 图片分辨率：建议不低于800x600
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "requestId": "req_20241201_001",
+    "predictions": [
+      {
+        "rank": 1,
+        "name": "绿萝",
+        "scientificName": null,
+        "confidence": 0.95,
+        "baikeUrl": "https://baike.baidu.com/item/绿萝",
+        "description": "绿萝，属于麒麟叶属植物，大型常绿藤本，生长于热带地区，常作为垂直绿化植物使用。"
+      },
+      {
+        "rank": 2,
+        "name": "黄金葛",
+        "scientificName": "Epipremnum aureum 'Golden'",
+        "confidence": 0.72,
+        "baikeUrl": "https://baike.baidu.com/item/黄金葛"
+      },
+      {
+        "rank": 3,
+        "name": "心叶蔓绿绒",
+        "scientificName": "Philodendron hederaceum",
+        "confidence": 0.35
+      }
+    ],
+    "processingTime": 1.23,
+    "cached": false
+  }
+}
+```
+
+**错误响应**:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "IDENTIFICATION_FAILED",
+    "message": "植物识别失败，请上传更清晰的图片"
+  }
+}
+```
+
+### 7.2 获取识别历史
+
+**接口**: `GET /identifications`
+
+**查询参数**:
+```
+?page=1
+?limit=20
+?plantId=123 (可选，筛选已创建的植物)
+```
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "imageUrl": "https://example.com/uploads/identifications/1.jpg",
+        "topPrediction": "绿萝",
+        "confidence": 0.95,
+        "selectedPlantId": 123,
+        "selectedPlant": {
+          "id": 123,
+          "name": "绿萝",
+          "primaryImageUrl": "https://example.com/uploads/plants/123.jpg"
+        },
+        "feedback": "correct",
+        "createdAt": "2024-12-01T10:00:00Z"
+      },
+      {
+        "id": 2,
+        "imageUrl": "https://example.com/uploads/identifications/2.jpg",
+        "topPrediction": "龟背竹",
+        "confidence": 0.88,
+        "selectedPlantId": null,
+        "selectedPlant": null,
+        "feedback": "skipped",
+        "createdAt": "2024-12-01T09:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 50,
+      "totalPages": 3
+    }
+  }
+}
+```
+
+### 7.3 获取识别详情
+
+**接口**: `GET /identifications/:id`
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "imageUrl": "https://example.com/uploads/identifications/1.jpg",
+    "imageHash": "a3f5d8c9b2e1f4a6...",
+    "apiProvider": "baidu",
+    "requestId": "req_20241201_001",
+    "predictions": [
+      {
+        "rank": 1,
+        "name": "绿萝",
+        "confidence": 0.95,
+        "baikeUrl": "https://baike.baidu.com/item/绿萝",
+        "description": "绿萝详细描述..."
+      }
+    ],
+    "selectedPlantId": 123,
+    "feedback": "correct",
+    "correctName": null,
+    "processingTime": 1.23,
+    "cached": false,
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T10:05:00Z"
+  }
+}
+```
+
+### 7.4 提交识别反馈
+
+**接口**: `POST /identifications/:id/feedback`
+
+**说明**: 用户确认识别结果是否正确，用于数据收集和后续模型优化
+
+**请求体**:
+```json
+{
+  "feedback": "correct",
+  "plantId": 123,
+  "correctName": null
+}
+```
+
+**反馈类型**:
+- `correct`: 识别正确，关联到植物ID
+- `incorrect`: 识别错误，提供正确的植物名称
+- `skipped`: 用户跳过，未使用识别结果
+
+**响应**: `200 OK`
+```json
+{
+  "success": true,
+  "message": "反馈已提交",
+  "data": {
+    "id": 1,
+    "feedback": "correct",
+    "selectedPlantId": 123,
+    "updatedAt": "2024-12-01T10:05:00Z"
+  }
+}
+```
+
+### 7.5 基于识别结果创建植物
+
+**接口**: `POST /identifications/:id/create-plant`
+
+**说明**: 基于识别结果快速创建植物档案，自动填充植物名称和描述
+
+**请求体**:
+```json
+{
+  "roomId": 1,
+  "shelfId": null,
+  "purchaseDate": "2024-01-01",
+  "healthStatus": "healthy",
+  "configs": [
+    {
+      "taskTypeId": 1,
+      "intervalDays": 7
+    },
+    {
+      "taskTypeId": 2,
+      "intervalDays": 30
+    }
+  ]
+}
+```
+
+**响应**: `201 Created`
+```json
+{
+  "success": true,
+  "message": "植物创建成功",
+  "data": {
+    "plant": {
+      "id": 123,
+      "name": "绿萝",
+      "scientificName": null,
+      "description": "绿萝，属于麒麟叶属植物，大型常绿藤本，生长于热带地区...",
+      "roomId": 1,
+      "room": {
+        "id": 1,
+        "name": "客厅"
+      },
+      "purchaseDate": "2024-01-01",
+      "healthStatus": "healthy",
+      "primaryImageUrl": "https://example.com/uploads/identifications/1.jpg",
+      "identificationId": 1,
+      "source": "identify",
+      "isActive": true,
+      "configs": [],
+      "createdAt": "2024-12-01T10:00:00Z",
+      "updatedAt": "2024-12-01T10:00:00Z"
+    }
+  }
+}
+```
+
+### 7.6 删除识别记录
+
+**接口**: `DELETE /identifications/:id`
+
+**说明**: 删除识别记录（不会删除已创建的植物）
+
+**响应**: `204 No Content`
+
+**注意**:
+- 如果识别记录已关联到植物，删除后植物的`identification_id`字段会被设为NULL
+- 建议软删除，保留数据用于统计分析
+
+---
+
+## 8. 任务类型模块
+
+### 8.1 获取任务类型列表
 
 **接口**: `GET /task-types`
 
@@ -866,7 +1121,7 @@ isPrimary: true
 }
 ```
 
-### 7.2 创建自定义任务类型
+### 8.2 创建自定义任务类型
 
 **接口**: `POST /task-types`
 
@@ -886,9 +1141,9 @@ isPrimary: true
 
 ---
 
-## 8. 植物养护配置模块
+## 9. 植物养护配置模块
 
-### 8.1 获取植物的养护配置
+### 9.1 获取植物的养护配置
 
 **接口**: `GET /plants/:plantId/configs`
 
@@ -921,7 +1176,7 @@ isPrimary: true
 }
 ```
 
-### 8.2 创建养护配置
+### 9.2 创建养护配置
 
 **接口**: `POST /plants/:plantId/configs`
 
@@ -959,7 +1214,7 @@ isPrimary: true
 }
 ```
 
-### 8.3 更新养护配置
+### 9.3 更新养护配置
 
 **接口**: `PATCH /plants/:plantId/configs/:configId`
 
@@ -973,7 +1228,7 @@ isPrimary: true
 
 **响应**: `200 OK`
 
-### 8.4 删除养护配置
+### 9.4 删除养护配置
 
 **接口**: `DELETE /plants/:plantId/configs/:configId`
 
@@ -981,9 +1236,9 @@ isPrimary: true
 
 ---
 
-## 9. 养护记录模块
+## 10. 养护记录模块
 
-### 9.1 获取养护记录列表
+### 14.1 获取养护记录列表
 
 **接口**: `GET /care-logs`
 
@@ -1027,7 +1282,7 @@ isPrimary: true
 }
 ```
 
-### 9.2 获取植物的养护历史
+### 14.2 获取植物的养护历史
 
 **接口**: `GET /plants/:plantId/care-logs`
 
@@ -1068,7 +1323,7 @@ isPrimary: true
 }
 ```
 
-### 9.3 记录养护操作
+### 13.3 记录养护操作
 
 **接口**: `POST /care-logs`
 
@@ -1120,7 +1375,7 @@ isPrimary: true
 
 **注意**: 创建养护记录后，系统会自动更新对应的`plant_configs`（`lastDoneAt`和`nextDueAt`）
 
-### 9.4 快速记录（推荐使用）
+### 11.4 快速记录（推荐使用）
 
 **接口**: `POST /plants/:plantId/care-logs/quick`
 
@@ -1136,7 +1391,7 @@ isPrimary: true
 
 **响应**: `201 Created`
 
-### 9.5 更新养护记录
+### 10.5 更新养护记录
 
 **接口**: `PATCH /care-logs/:logId`
 
@@ -1150,7 +1405,7 @@ isPrimary: true
 
 **响应**: `200 OK`
 
-### 9.6 删除养护记录
+### 10.6 删除养护记录
 
 **接口**: `DELETE /care-logs/:logId`
 
@@ -1158,9 +1413,9 @@ isPrimary: true
 
 ---
 
-## 10. 任务提醒模块
+## 11. 任务提醒模块
 
-### 10.1 获取今日任务
+### 14.1 获取今日任务
 
 **接口**: `GET /tasks/today`
 
@@ -1200,7 +1455,7 @@ isPrimary: true
 }
 ```
 
-### 10.2 获取即将到期任务
+### 14.2 获取即将到期任务
 
 **接口**: `GET /tasks/upcoming`
 
@@ -1236,7 +1491,7 @@ isPrimary: true
 }
 ```
 
-### 10.3 获取逾期任务
+### 13.3 获取逾期任务
 
 **接口**: `GET /tasks/overdue`
 
@@ -1267,7 +1522,7 @@ isPrimary: true
 }
 ```
 
-### 10.4 快速完成任务
+### 11.4 快速完成任务
 
 **接口**: `POST /tasks/:taskId/complete`
 
@@ -1285,9 +1540,9 @@ isPrimary: true
 
 ---
 
-## 11. 统计分析模块
+## 12. 统计分析模块
 
-### 11.1 获取仪表盘数据
+### 14.1 获取仪表盘数据
 
 **接口**: `GET /stats/dashboard`
 
@@ -1339,7 +1594,7 @@ isPrimary: true
 }
 ```
 
-### 11.2 获取养护统计
+### 14.2 获取养护统计
 
 **接口**: `GET /stats/care`
 
@@ -1386,7 +1641,7 @@ isPrimary: true
 }
 ```
 
-### 11.3 获取植物健康度报告
+### 13.3 获取植物健康度报告
 
 **接口**: `GET /stats/health-report`
 
@@ -1415,9 +1670,9 @@ isPrimary: true
 
 ---
 
-## 12. 导出模块
+## 13. 导出模块
 
-### 12.1 导出植物清单
+### 14.1 导出植物清单
 
 **接口**: `GET /exports/plants`
 
@@ -1436,7 +1691,7 @@ Content-Disposition: attachment; filename="plants_20241201.xlsx"
 <binary file>
 ```
 
-### 12.2 导出养护记录
+### 14.2 导出养护记录
 
 **接口**: `GET /exports/care-logs`
 
@@ -1453,7 +1708,7 @@ Content-Disposition: attachment; filename="care_logs_20241201.csv"
 <binary file>
 ```
 
-### 12.3 导出养护报告
+### 13.3 导出养护报告
 
 **接口**: `POST /exports/care-report`
 
@@ -1479,9 +1734,9 @@ Content-Disposition: attachment; filename="care_report_20241201.pdf"
 
 ---
 
-## 13. 系统配置模块
+## 14. 系统配置模块
 
-### 13.1 获取系统配置
+### 14.1 获取系统配置
 
 **接口**: `GET /settings`
 
@@ -1501,7 +1756,7 @@ Content-Disposition: attachment; filename="care_report_20241201.pdf"
 }
 ```
 
-### 13.2 更新系统配置
+### 14.2 更新系统配置
 
 **接口**: `PATCH /settings`
 
@@ -1520,7 +1775,7 @@ Content-Disposition: attachment; filename="care_report_20241201.pdf"
 
 ---
 
-## 14. 错误码说明
+## 15. 错误码说明
 
 | 错误码 | 说明 | HTTP状态码 |
 |--------|------|-----------|
@@ -1556,7 +1811,8 @@ Content-Disposition: attachment; filename="care_report_20241201.pdf"
 
 ---
 
-## 15. 数据模型（TypeScript）
+#
+## 16. 数据模型（TypeScript）
 
 ### 15.1 核心类型定义
 
@@ -1763,9 +2019,9 @@ interface DashboardStats {
 
 ---
 
-## 16. 使用示例
+## 17. 使用示例
 
-### 16.1 创建完整的植物记录
+### 19.1 创建完整的植物记录
 
 ```bash
 # 1. 创建房间
@@ -1797,7 +2053,7 @@ curl -X POST http://localhost:3000/api/plants/1/images \
   -F "isPrimary=true"
 ```
 
-### 16.2 记录养护操作
+### 19.2 记录养护操作
 
 ```bash
 # 方式1: 完整记录
@@ -1826,7 +2082,7 @@ curl -X POST http://localhost:3000/api/tasks/5/complete \
   }'
 ```
 
-### 16.3 查询即将到期的任务
+### 18.3 查询即将到期的任务
 
 ```bash
 # 查询今日任务
@@ -1841,19 +2097,19 @@ curl http://localhost:3000/api/tasks/overdue
 
 ---
 
-## 17. API测试工具推荐
+## 18. API测试工具推荐
 
-### 17.1 Thunder Client（VS Code插件）
+### 19.1 Thunder Client（VS Code插件）
 - 安装插件：`Thunder Client`
 - 导入API集合
 - 保存环境变量
 
-### 17.2 Postman
+### 19.2 Postman
 - 导入JSON格式的API定义
 - 使用环境变量管理不同环境
 - 自动化测试脚本
 
-### 17.3 示例环境变量
+### 18.3 示例环境变量
 
 ```json
 {
@@ -1868,13 +2124,13 @@ curl http://localhost:3000/api/tasks/overdue
 
 如需实时更新任务提醒，可使用WebSocket：
 
-### 18.1 连接
+### 19.1 连接
 
 ```
 ws://localhost:3000/ws
 ```
 
-### 18.2 订阅任务更新
+### 19.2 订阅任务更新
 
 **客户端发送**:
 ```json
@@ -1899,7 +2155,7 @@ ws://localhost:3000/ws
 
 ---
 
-## 19. 开发计划
+## 20. 开发计划
 
 ### MVP阶段API（V1.0）
 - ✅ 房间管理 CRUD
