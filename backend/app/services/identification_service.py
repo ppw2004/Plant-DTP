@@ -6,14 +6,18 @@ import json
 import hashlib
 import uuid
 from typing import Optional, List, Dict
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
 from app.models.plant_identification import PlantIdentification
 from app.models.plant import Plant
+from app.models.plant_image import PlantImage
 from app.services.baidu_ai_service import baidu_ai_service
 from app.core.config import settings
+from app.utils.image_utils import create_thumbnail, get_image_dimensions
+from pathlib import Path
+import shutil
 
 
 class IdentificationService:
@@ -301,7 +305,6 @@ class IdentificationService:
         top_prediction = predictions[0]
 
         # 解析购买日期
-        from datetime import datetime
         parsed_purchase_date = None
         if purchase_date:
             try:
@@ -327,12 +330,106 @@ class IdentificationService:
         self.db.commit()
         self.db.refresh(plant)
 
+        # 将识别照片添加为植物的主图
+        try:
+            print(f"[DEBUG] 开始添加识别照片 identification_id={identification.id}, plant_id={plant.id}")
+            self._add_identification_image_to_plant(identification.id, plant.id)
+            print("[DEBUG] 识别照片添加成功")
+        except Exception as e:
+            # 图片添加失败不影响植物创建
+            import traceback
+            print(f"添加识别照片失败: {e}")
+            traceback.print_exc()
+
         # 更新识别记录的反馈
         identification.feedback = "correct"
         identification.selected_plant_id = plant.id
         self.db.commit()
 
         return plant.to_dict(include_images=False)
+
+    def _add_identification_image_to_plant(
+        self,
+        identification_id: int,
+        plant_id: int
+    ) -> bool:
+        """
+        将识别照片添加为植物图片
+
+        Args:
+            identification_id: 识别记录ID
+            plant_id: 植物ID
+
+        Returns:
+            是否添加成功
+        """
+        # 获取识别记录
+        identification = self.db.query(PlantIdentification).filter(
+            PlantIdentification.id == identification_id
+        ).first()
+
+        if not identification or not identification.image_url:
+            return False
+
+        # 原图路径（去掉开头的 /）
+        source_path_str = identification.image_url.lstrip('/')
+        source_path = Path(source_path_str)
+
+        if not source_path.exists():
+            print(f"识别图片不存在: {source_path}")
+            return False
+
+        # 创建植物图片目录
+        plant_images_dir = Path(settings.UPLOAD_DIR) / "plant_images" / str(plant_id)
+        plant_images_dir.mkdir(parents=True, exist_ok=True)
+
+        # 生成新文件名
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        ext = source_path.suffix
+        new_filename = f"identification_{identification_id}_{timestamp}{ext}"
+        target_path = plant_images_dir / new_filename
+
+        # 复制图片文件
+        try:
+            shutil.copy2(source_path, target_path)
+        except Exception as e:
+            print(f"复制图片失败: {e}")
+            return False
+
+        # 创建缩略图
+        thumbnail_path = plant_images_dir / f"thumb_{new_filename}"
+        thumbnail_created = create_thumbnail(target_path, thumbnail_path)
+
+        # 获取图片尺寸
+        dimensions = get_image_dimensions(target_path)
+        width, height = dimensions if dimensions else (None, None)
+
+        # 获取文件大小
+        file_size = target_path.stat().st_size
+
+        # 生成URL路径
+        url_path = f"/{target_path}"
+        thumbnail_url_path = f"/{thumbnail_path}" if thumbnail_created else None
+
+        # 创建图片记录（作为主图）
+        plant_image = PlantImage(
+            plant_id=plant_id,
+            url=url_path,
+            thumbnail_url=thumbnail_url_path,
+            caption=f"识别照片 - {identification.predictions and json.loads(identification.predictions)[0].get('name', '未知植物')}",
+            is_primary=True,  # 设置为主图
+            file_size=file_size,
+            width=width,
+            height=height,
+            taken_at=identification.created_at,
+            sort_order=0
+        )
+
+        self.db.add(plant_image)
+        self.db.commit()
+
+        print(f"成功添加识别照片到植物 {plant_id}: {url_path}")
+        return True
 
     def delete_identification(self, identification_id: int) -> bool:
         """
