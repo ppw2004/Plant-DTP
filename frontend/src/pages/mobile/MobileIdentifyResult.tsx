@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { Button, Card, Divider } from 'antd-mobile'
-import { LeftOutline, ClockOutline } from 'antd-mobile-icons'
+import { LeftOutline, ClockCircleOutline } from 'antd-mobile-icons'
 import IdentifyResultCard from '../../components/mobile/IdentifyResultCard'
 import IdentifyFeedback from '../../components/mobile/IdentifyFeedback'
 import { useIdentification } from '../../hooks/useIdentifications'
@@ -103,7 +103,7 @@ export default function MobileIdentifyResult() {
           <div style={{ fontSize: 14, color: '#666' }}>
             {cached ? (
               <span style={{ color: '#52c41a' }}>
-                <ClockOutline style={{ marginRight: 4 }} />
+                <ClockCircleOutline style={{ marginRight: 4 }} />
                 缓存结果
               </span>
             ) : (

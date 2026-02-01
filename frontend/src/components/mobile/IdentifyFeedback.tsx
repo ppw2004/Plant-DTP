@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Modal, Button, Input, Select, Space, Toast } from 'antd-mobile'
-import { CheckOutline, CloseOutline, SkipOutline } from 'antd-mobile-icons'
+import { Modal, Button, Input, Space, Toast } from 'antd-mobile'
+import { CheckOutline, CloseOutline, StopOutline } from 'antd-mobile-icons'
 import { useSubmitFeedback } from '../../hooks/useIdentifications'
 import { useCreatePlantFromIdentification } from '../../hooks/useIdentifications'
 import { useRooms } from '../../hooks/useRooms'
@@ -134,7 +134,7 @@ export default function IdentifyFeedback({
                   size="large"
                   onClick={handleSkip}
                 >
-                  <SkipOutline /> 跳过
+                  <StopOutline /> 跳过
                 </Button>
               </Space>
             </>
@@ -151,15 +151,25 @@ export default function IdentifyFeedback({
                     <div style={{ fontSize: 14, marginBottom: 8, color: '#333' }}>
                       选择房间 <span style={{ color: '#ff4d4f' }}>*</span>
                     </div>
-                    <Select
-                      placeholder="请选择房间"
-                      value={roomId}
-                      onChange={(value: string | null) => setRoomId(value ? Number(value) : undefined)}
-                      options={rooms.map((room) => ({
-                        label: room.name,
-                        value: String(room.id),
-                      }))}
-                    />
+                    <select
+                      value={roomId || ''}
+                      onChange={(e) => setRoomId(e.target.value ? Number(e.target.value) : undefined)}
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: '1px solid #d9d9d9',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        backgroundColor: '#fff',
+                      }}
+                    >
+                      <option value="">请选择房间</option>
+                      {rooms.map((room) => (
+                        <option key={room.id} value={room.id}>
+                          {room.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <Button

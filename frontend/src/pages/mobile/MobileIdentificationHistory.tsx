@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, Button, InfiniteScroll, PullToRefresh, EmptyBlock } from 'antd-mobile'
+import { Card, Button, InfiniteScroll, PullToRefresh, Empty } from 'antd-mobile'
 import { DeleteOutline } from 'antd-mobile-icons'
 import { useIdentifications, useDeleteIdentification } from '../../hooks/useIdentifications'
 import dayjs from 'dayjs'
@@ -118,7 +118,7 @@ export default function MobileIdentificationHistory() {
           <h1 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>识别历史</h1>
         </div>
 
-        <EmptyBlock
+        <Empty
           description="暂无识别记录"
           style={{
             padding: '60px 0',
@@ -126,15 +126,15 @@ export default function MobileIdentificationHistory() {
             flexDirection: 'column',
             alignItems: 'center',
           }}
-        >
+        />
+        <div style={{ textAlign: 'center' }}>
           <Button
             color="primary"
             onClick={() => navigate('/mobile/identify')}
-            style={{ marginTop: 16 }}
           >
             开始识别
           </Button>
-        </EmptyBlock>
+        </div>
       </div>
     )
   }

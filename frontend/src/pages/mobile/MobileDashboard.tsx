@@ -5,7 +5,7 @@ import {
   CheckCircleOutline,
   ClockCircleOutline,
   CameraOutline,
-  HistoryOutline,
+  HistogramOutline,
 } from 'antd-mobile-icons'
 import { useNavigate } from 'react-router-dom'
 import { useDashboardStats } from '../../hooks/useDashboard'
@@ -132,7 +132,7 @@ export default function MobileDashboard() {
             onClick={() => navigate('/mobile/identify/history')}
             style={{ cursor: 'pointer', textAlign: 'center', padding: '16px 0' }}
           >
-            <HistoryOutline style={{ fontSize: 28, color: '#1677ff' }} />
+            <HistogramOutline style={{ fontSize: 28, color: '#1677ff' }} />
             <div style={{ fontSize: 14, marginTop: 8, fontWeight: 500 }}>识别历史</div>
           </Card>
         </Grid.Item>
