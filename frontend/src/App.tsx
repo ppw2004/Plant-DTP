@@ -22,6 +22,9 @@ import MobilePlantDetail from './pages/mobile/MobilePlantDetail'
 import MobileRooms from './pages/mobile/MobileRooms'
 import MobileRoomDetail from './pages/mobile/MobileRoomDetail'
 import MobileTasks from './pages/mobile/MobileTasks'
+import MobileIdentify from './pages/mobile/MobileIdentify'
+import MobileIdentifyResult from './pages/mobile/MobileIdentifyResult'
+import MobileIdentificationHistory from './pages/mobile/MobileIdentificationHistory'
 
 function App() {
   return (
@@ -44,6 +47,9 @@ function App() {
         <Route path="rooms" element={<MobileRooms />} />
         <Route path="rooms/:id" element={<MobileRoomDetail />} />
         <Route path="tasks" element={<MobileTasks />} />
+        <Route path="identify" element={<MobileIdentify />} />
+        <Route path="identify/result/:id" element={<MobileIdentifyResult />} />
+        <Route path="identify/history" element={<MobileIdentificationHistory />} />
       </Route>
 
       {/* ==================== 404页面 ==================== */}

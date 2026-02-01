@@ -4,6 +4,8 @@ import {
   UnorderedListOutline,
   CheckCircleOutline,
   ClockCircleOutline,
+  CameraOutline,
+  HistoryOutline,
 } from 'antd-mobile-icons'
 import { useNavigate } from 'react-router-dom'
 import { useDashboardStats } from '../../hooks/useDashboard'
@@ -30,6 +32,25 @@ export default function MobileDashboard() {
       <h3 style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 16, margin: 0 }}>
         👋 欢迎回来！
       </h3>
+
+      {/* 植物识别快捷入口 */}
+      <Card
+        onClick={() => navigate('/mobile/identify')}
+        style={{
+          marginBottom: 16,
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: '#fff',
+          cursor: 'pointer',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 4 }}>🌿 植物识别</div>
+            <div style={{ fontSize: 13, opacity: 0.9 }}>拍照或上传图片识别植物</div>
+          </div>
+          <CameraOutline style={{ fontSize: 32 }} />
+        </div>
+      </Card>
 
       {/* 统计卡片 */}
       <Grid columns={2} gap={16}>
@@ -90,6 +111,29 @@ export default function MobileDashboard() {
               </div>
               <div style={{ fontSize: 12, color: '#999' }}>逾期任务</div>
             </div>
+          </Card>
+        </Grid.Item>
+      </Grid>
+
+      {/* 快捷功能入口 */}
+      <Grid columns={2} gap={12} style={{ marginTop: 16 }}>
+        <Grid.Item>
+          <Card
+            onClick={() => navigate('/mobile/identify')}
+            style={{ cursor: 'pointer', textAlign: 'center', padding: '16px 0' }}
+          >
+            <CameraOutline style={{ fontSize: 28, color: '#1677ff' }} />
+            <div style={{ fontSize: 14, marginTop: 8, fontWeight: 500 }}>拍照识别</div>
+          </Card>
+        </Grid.Item>
+
+        <Grid.Item>
+          <Card
+            onClick={() => navigate('/mobile/identify/history')}
+            style={{ cursor: 'pointer', textAlign: 'center', padding: '16px 0' }}
+          >
+            <HistoryOutline style={{ fontSize: 28, color: '#1677ff' }} />
+            <div style={{ fontSize: 14, marginTop: 8, fontWeight: 500 }}>识别历史</div>
           </Card>
         </Grid.Item>
       </Grid>

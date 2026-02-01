@@ -243,3 +243,71 @@ export interface SuggestionFilters {
   skip?: number
   limit?: number
 }
+
+// ==================== Plant Identification Types ====================
+
+export interface PlantPrediction {
+  rank: number
+  name: string
+  scientificName?: string
+  confidence: number
+  baikeUrl?: string
+  description?: string
+}
+
+export interface IdentificationResult {
+  requestId: string
+  predictions: PlantPrediction[]
+  processingTime: number
+  cached: boolean
+  identificationId: number
+}
+
+export interface Identification {
+  id: number
+  imageUrl: string
+  imageHash?: string
+  apiProvider: string
+  requestId?: string
+  predictions: PlantPrediction[]
+  selectedPlantId?: number
+  feedback?: 'correct' | 'incorrect' | 'skipped'
+  correctName?: string
+  processingTime?: number
+  cached: boolean
+  createdAt: string
+  updatedAt: string
+  selectedPlant?: {
+    id: number
+    name: string
+    primaryImageUrl?: string
+  }
+}
+
+export interface IdentificationListResponse {
+  items: Identification[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface IdentificationFilters {
+  page?: number
+  limit?: number
+  userId?: number
+  plantId?: number
+}
+
+export interface IdentificationFeedbackData {
+  feedback: 'correct' | 'incorrect' | 'skipped'
+  plantId?: number
+  correctName?: string
+}
+
+export interface CreatePlantFromIdentificationData {
+  roomId: number
+  shelfId?: number
+  purchaseDate?: string
+  healthStatus?: 'healthy' | 'good' | 'fair' | 'poor' | 'critical'
+}

@@ -110,7 +110,7 @@ export default function MobileLayout() {
         }}>
           <TabBar
             activeKey={activeKey}
-            onChange={(key) => {
+            onChange={(key: string) => {
               const tab = tabs.find(t => t.key === key)
               if (tab) navigate(tab.path)
             }}
